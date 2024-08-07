@@ -60,13 +60,13 @@ public class WarpSyncMachine {
     }
 
     public void start() {
-        if (this.chainService.getChainSpec().getLightSyncState() != null) {
-            LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
+//        if (this.chainService.getChainSpec().getLightSyncState() != null) {
+//            LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
 //            if (this.syncState.getLastFinalizedBlockNumber()
 //                        .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
 //                this.syncState.setLightSyncState(initState);
 //            }
-        }
+//        }
         final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
 
         // Always start with requesting fragments

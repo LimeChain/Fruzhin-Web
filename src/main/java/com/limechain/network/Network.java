@@ -9,6 +9,7 @@ import com.limechain.storage.KVRepository;
 import com.limechain.sync.warpsync.WarpSyncState;
 import lombok.Getter;
 import lombok.extern.java.Log;
+import org.teavm.jso.JSBody;
 
 import java.util.Random;
 import java.util.logging.Level;
@@ -25,7 +26,7 @@ public class Network {
     private final Chain chain;
     @Getter
     private final String[] bootNodes;
-//    private final ConnectionManager connectionManager;
+    //    private final ConnectionManager connectionManager;
     @Getter
     private KademliaService kademliaService;
     private boolean started = false;
@@ -37,12 +38,26 @@ public class Network {
      * Manages if nodes running locally are going to be allowed
      * Connects Kademlia to boot nodes
      *
-     * @param chainService     chain specification information containing boot nodes
-     * @param hostConfig       host configuration containing current network
-     * @param repository       database repository
+     * @param chainService chain specification information containing boot nodes
+     * @param hostConfig   host configuration containing current network
+     * @param repository   database repository
      */
     public Network(ChainService chainService, HostConfig hostConfig, KVRepository<String, Object> repository) {
-        this.bootNodes = null;// chainService.getChainSpec().getBootNodes();
+        this.bootNodes = new String[]{
+                "/dns/polkadot-bootnode-0.polkadot.io/tcp/30333/p2p/12D3KooWSz8r2WyCdsfWHgPyvD8GKQdJ1UAiRmrcrs8sQB3fe2KU",
+                "/dns/polkadot-bootnode-0.polkadot.io/tcp/30334/ws/p2p/12D3KooWSz8r2WyCdsfWHgPyvD8GKQdJ1UAiRmrcrs8sQB3fe2KU",
+                "/dns/polkadot-bootnode-0.polkadot.io/tcp/443/wss/p2p/12D3KooWSz8r2WyCdsfWHgPyvD8GKQdJ1UAiRmrcrs8sQB3fe2KU",
+                "/dns/polkadot-bootnode-1.polkadot.io/tcp/30333/p2p/12D3KooWFN2mhgpkJsDBuNuE5427AcDrsib8EoqGMZmkxWwx3Md4",
+                "/dns/polkadot-bootnode-1.polkadot.io/tcp/30334/ws/p2p/12D3KooWFN2mhgpkJsDBuNuE5427AcDrsib8EoqGMZmkxWwx3Md4",
+                "/dns/polkadot-bootnode-1.polkadot.io/tcp/443/wss/p2p/12D3KooWFN2mhgpkJsDBuNuE5427AcDrsib8EoqGMZmkxWwx3Md4",
+                "/dns/polkadot-boot.dwellir.com/tcp/30334/ws/p2p/12D3KooWKvdDyRKqUfSAaUCbYiLwKY8uK3wDWpCuy2FiDLbkPTDJ",
+                "/dns/polkadot-boot.dwellir.com/tcp/443/wss/p2p/12D3KooWKvdDyRKqUfSAaUCbYiLwKY8uK3wDWpCuy2FiDLbkPTDJ",
+                "/dns/boot.stake.plus/tcp/30333/p2p/12D3KooWKT4ZHNxXH4icMjdrv7EwWBkfbz5duxE5sdJKKeWFYi5n",
+                "/dns/boot.stake.plus/tcp/30334/wss/p2p/12D3KooWKT4ZHNxXH4icMjdrv7EwWBkfbz5duxE5sdJKKeWFYi5n",
+                "/dns/boot-node.helikon.io/tcp/7070/p2p/12D3KooWS9ZcvRxyzrSf6p63QfTCWs12nLoNKhGux865crgxVA4H",
+                "/dns/boot-node.helikon.io/tcp/7072/wss/p2p/12D3KooWS9ZcvRxyzrSf6p63QfTCWs12nLoNKhGux865crgxVA4H",
+                "/dns/polkadot.bootnode.amforc.com/tcp/30333/p2p/12D3KooWAsuCEVCzUVUrtib8W82Yne3jgVGhQZN3hizko5FTnDg3",
+                "/dns/polkadot.bootnode.amforc.com/tcp/30334/wss/p2p/12D3KooWAsuCEVCzUVUrtib8W82Yne3jgVGhQZN3hizko5FTnDg3"};
         this.chain = hostConfig.getChain();
 //        this.connectionManager = ConnectionManager.getInstance();
         this.initializeProtocols(chainService, hostConfig, repository);
@@ -51,12 +66,10 @@ public class Network {
     private void initializeProtocols(ChainService chainService,
                                      HostConfig hostConfig,
                                      KVRepository<String, Object> repository) {
-        boolean isLocalEnabled = hostConfig.getChain() == Chain.LOCAL;
-        boolean clientMode = true;
+
 //
 //        String pingProtocol = ProtocolUtils.PING_PROTOCOL;
 //        String chainId = chainService.getChainSpec().getProtocolId();
-//        String kadProtocolId = ProtocolUtils.getKadProtocol(chainId);
 //        String warpProtocolId = ProtocolUtils.getWarpSyncProtocol(chainId);
 //        String lightProtocolId = ProtocolUtils.getLightMessageProtocol(chainId);
 //        String syncProtocolId = ProtocolUtils.getSyncProtocol(chainId);
@@ -65,7 +78,7 @@ public class Network {
 //        String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol(chainId);
 //        String transactionsProtocolId = ProtocolUtils.getTransactionsProtocol(chainId);
 
-//        kademliaService = new KademliaService(kadProtocolId, isLocalEnabled, clientMode);
+        kademliaService = new KademliaService();
     }
 
 //    private Ed25519PrivateKey loadPrivateKeyFromDB(KVRepository<String, Object> repository) {
@@ -85,6 +98,7 @@ public class Network {
 
     public void start() {
         log.log(Level.INFO, "Starting network module...");
+
         kademliaService.connectBootNodes(this.bootNodes);
         started = true;
         log.log(Level.INFO, "Started network module!");
@@ -161,7 +175,7 @@ public class Network {
         log.log(Level.INFO, String.format("Connected peers: %s", getPeersCount()));
     }
 
-//    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
+    //    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
     public void pingPeers() {
         // TODO: This needs to by synchronized with the findPeers method
         if (getPeersCount() == 0) {
@@ -259,7 +273,7 @@ public class Network {
 //        ).start();
 //    }
 
-//    @Scheduled(fixedRate = 5, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
+    //    @Scheduled(fixedRate = 5, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
     public void sendNeighbourMessages() {
         if (!AppBean.getBean(WarpSyncState.class).isWarpSyncFinished()) {
             return;
