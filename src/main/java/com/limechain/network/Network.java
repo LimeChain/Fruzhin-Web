@@ -68,15 +68,11 @@ public class Network {
                                      KVRepository<String, Object> repository) {
 
 //
-//        String pingProtocol = ProtocolUtils.PING_PROTOCOL;
 //        String chainId = chainService.getChainSpec().getProtocolId();
 //        String warpProtocolId = ProtocolUtils.getWarpSyncProtocol(chainId);
 //        String lightProtocolId = ProtocolUtils.getLightMessageProtocol(chainId);
-//        String syncProtocolId = ProtocolUtils.getSyncProtocol(chainId);
-//        String stateProtocolId = ProtocolUtils.getStateProtocol(chainId);
 //        String blockAnnounceProtocolId = ProtocolUtils.getBlockAnnounceProtocol(chainId);
 //        String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol(chainId);
-//        String transactionsProtocolId = ProtocolUtils.getTransactionsProtocol(chainId);
 
         kademliaService = new KademliaService();
     }
