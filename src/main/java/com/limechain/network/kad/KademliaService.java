@@ -53,9 +53,7 @@ public class KademliaService /*extends NetworkService<Kademlia>*/ {
     public int connectBootNodes(String[] bootNodes) {
         startNetwork(bootNodes);
         Object peer = getPeerId();
-        System.out.println(peer);
         while (peer.toString().equalsIgnoreCase("undefined")) {
-            System.out.println(peer);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -70,7 +68,7 @@ public class KademliaService /*extends NetworkService<Kademlia>*/ {
         PeerId peerId = new PeerId(privateKey, publicKey, peerIdStr);
         this.host = new Host(peerId);
 
-
+        successfulBootNodes = getPeerStoreSize();
 
         if (successfulBootNodes > 0)
             log.log(Level.INFO, "Successfully connected to " + successfulBootNodes + " boot nodes");
@@ -88,6 +86,8 @@ public class KademliaService /*extends NetworkService<Kademlia>*/ {
     public static native byte[] getPeerPrivateKey();
     @JSBody(script = "return libp.peerId.publicKey")
     public static native byte[] getPeerPublicKey();
+    @JSBody(script = "return libp.peerStore.store.datastore.data.size")
+    public static native int getPeerStoreSize();
 
 
     /**

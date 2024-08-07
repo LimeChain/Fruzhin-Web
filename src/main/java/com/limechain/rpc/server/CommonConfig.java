@@ -26,17 +26,12 @@ public class CommonConfig {
         getBean(HostConfig.class);
         getBean(KVRepository.class);
         Object bean = getBean(WarpSyncMachine.class);
-        log.log("WarpSyncMachina is null " + (bean == null));
-        log.log("Building SystemInfo");
     }
 
     protected static Object getBean(Class<?> beanClass) {
-        log.log("Getting bean: " + beanClass.getSimpleName());
         if (beans.containsKey(beanClass)) {
-            log.log("Bean found in map");
             return beans.get(beanClass);
         } else {
-            log.log("Bean not found in map, building");
             switch (beanClass.getSimpleName()) {
                 case "HostConfig":
                     HostConfig hostConfig = hostConfig();
