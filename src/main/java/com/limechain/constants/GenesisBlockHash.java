@@ -1,6 +1,5 @@
 package com.limechain.constants;
 
-
 import com.limechain.polkaj.Hash256;
 
 public class GenesisBlockHash {
