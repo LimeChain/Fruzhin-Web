@@ -20,8 +20,6 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.34")
     implementation("org.projectlombok:lombok:1.18.34")
 
-//    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
     implementation("org.teavm:teavm-jso-apis:0.10.0")
     implementation("org.teavm:teavm-jso:0.10.0")
 
