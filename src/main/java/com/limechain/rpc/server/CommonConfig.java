@@ -19,13 +19,12 @@ import java.util.Map;
 public class CommonConfig {
 
     private static Map<Class<?>, Object> beans = new HashMap<>();
-    private static final DivLogger log = new DivLogger();
 
     public static void start() {
         getBean(SystemInfo.class);
         getBean(HostConfig.class);
         getBean(KVRepository.class);
-        Object bean = getBean(WarpSyncMachine.class);
+        getBean(WarpSyncMachine.class);
     }
 
     protected static Object getBean(Class<?> beanClass) {
@@ -92,7 +91,6 @@ public class CommonConfig {
     }
 
     private static SystemInfo systemInfo(HostConfig hostConfig, SyncState syncState) {
-        log.log("Building SystemInfo method");
         return new SystemInfo(hostConfig, syncState);
     }
 

@@ -24,6 +24,5 @@ public class Main {
         // NOTE: This starts the beans the client would need - mutates the global context
         client.start();
         log.log(Level.INFO, "\uD83D\uDE80Started light client!");
-
     }
 }

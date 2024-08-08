@@ -4,15 +4,15 @@ import com.limechain.chain.ChainService;
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.chain.lightsyncstate.LightSyncState;
 import com.limechain.network.Network;
+import com.limechain.polkaj.Hash256;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.warpsync.action.FinishedAction;
 import com.limechain.sync.warpsync.action.RequestFragmentsAction;
 import com.limechain.sync.warpsync.action.WarpSyncAction;
-import io.emeraldpay.polkaj.types.Hash256;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
-import org.javatuples.Pair;
+import com.limechain.tuple.Pair;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -60,13 +60,14 @@ public class WarpSyncMachine {
     }
 
     public void start() {
-//        if (this.chainService.getChainSpec().getLightSyncState() != null) {
-//            LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
-//            if (this.syncState.getLastFinalizedBlockNumber()
-//                        .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
-//                this.syncState.setLightSyncState(initState);
-//            }
-//        }
+        if (this.chainService.getChainSpec().getLightSyncState() != null) {
+            LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
+            System.out.println(initState);
+            if (this.syncState.getLastFinalizedBlockNumber()
+                        .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
+                this.syncState.setLightSyncState(initState);
+            }
+        }
         final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
 
         // Always start with requesting fragments
@@ -93,7 +94,7 @@ public class WarpSyncMachine {
     private void finishWarpSync() {
         this.warpState.setWarpSyncFinished(true);
 //        this.networkService.handshakeBootNodes();
-        this.syncState.persistState();
+//        this.syncState.persistState();
         log.info("Warp sync finished.");
         this.onFinishCallbacks.forEach(Runnable::run);
     }

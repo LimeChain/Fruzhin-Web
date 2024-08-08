@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("war")
-    id("org.teavm") version "0.9.2"
+    id("org.teavm") version "0.10.0"
     id("io.freefair.lombok") version "8.6"
 }
 
@@ -20,18 +20,11 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.34")
     implementation("org.projectlombok:lombok:1.18.34")
 
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+//    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation("org.javatuples:javatuples:1.2")
+    implementation("org.teavm:teavm-jso-apis:0.10.0")
+    implementation("org.teavm:teavm-jso:0.10.0")
 
-    implementation("org.teavm:teavm-jso-apis:0.9.2")
-    implementation("org.teavm:teavm-jso:0.9.2")
-
-}
-
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
-    jvmArgs("-Dnet.bytebuddy.experimental=true")
 }
 
 teavm.js {
