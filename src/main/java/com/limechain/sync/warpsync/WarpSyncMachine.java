@@ -4,6 +4,7 @@ import com.limechain.chain.ChainService;
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.chain.lightsyncstate.LightSyncState;
 import com.limechain.network.Network;
+import com.limechain.network.protocol.warp.dto.WarpSyncFragment;
 import com.limechain.polkaj.Hash256;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.warpsync.action.FinishedAction;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.logging.Level;
 
 @Log
@@ -28,7 +30,7 @@ public class WarpSyncMachine {
 
     private final PriorityQueue<Pair<BigInteger, Authority[]>> scheduledAuthorityChanges;
     private final ChainInformation chainInformation;
-//    private Queue<WarpSyncFragment> fragmentsQueue;
+    private Queue<WarpSyncFragment> fragmentsQueue;
     private final ChainService chainService;
     private WarpSyncAction warpSyncAction;
     private final WarpSyncState warpState;
@@ -62,7 +64,6 @@ public class WarpSyncMachine {
     public void start() {
         if (this.chainService.getChainSpec().getLightSyncState() != null) {
             LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
-            System.out.println(initState);
             if (this.syncState.getLastFinalizedBlockNumber()
                         .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
                 this.syncState.setLightSyncState(initState);
