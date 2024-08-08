@@ -75,14 +75,14 @@ public class WarpSyncMachine {
         this.networkService.updateCurrentSelectedPeerWithNextBootnode();
         this.warpSyncAction = new RequestFragmentsAction(initStateHash);
 
-        new Thread(() -> {
-            while (this.warpSyncAction.getClass() != FinishedAction.class) {
-                this.handleState();
-                this.nextState();
-            }
-
-            finishWarpSync();
-        }).start();
+//        new Thread(() -> {
+//            while (this.warpSyncAction.getClass() != FinishedAction.class) {
+//                this.handleState();
+//                this.nextState();
+//            }
+//
+//            finishWarpSync();
+//        }).start();
     }
 
     public void stop() {
