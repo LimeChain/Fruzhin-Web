@@ -9,7 +9,6 @@ import com.limechain.storage.KVRepository;
 import com.limechain.sync.warpsync.WarpSyncState;
 import lombok.Getter;
 import lombok.extern.java.Log;
-import org.teavm.jso.JSBody;
 
 import java.util.Random;
 import java.util.logging.Level;
