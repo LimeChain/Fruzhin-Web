@@ -30,6 +30,8 @@ teavm.js {
     targetFileName = "fruzhin.js"
 }
 
+
+//TODO: Debug only. Remove when doing release build
 teavm {
     js {
         sourceMap.set(true)
