@@ -19,8 +19,6 @@ public class StringUtils {
      * @throws IllegalArgumentException if the hex string has an odd length or does not match the hex pattern
      */
     public static byte[] hexToBytes(String hex) {
-        System.out.println(hex.length());
-        System.out.println(hex.length() % 2);
         if (hex.length() % 2 != 0) {
             throw new IllegalArgumentException("Invalid hex string length");
         }
@@ -28,8 +26,7 @@ public class StringUtils {
         // Trim the 0x prefix if it exists
         hex = remove0xPrefix(hex);
 
-        byte[] bytes = fromHex(hex);
-        return bytes;
+        return fromHex(hex);
     }
 
     @JSBody(params = { "hex" }, script = " let bytes = [];" +
