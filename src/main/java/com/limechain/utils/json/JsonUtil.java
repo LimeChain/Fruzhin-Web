@@ -10,6 +10,10 @@ public class JsonUtil {
         return new JsonParser(readJsonFromFile(jsonPath)).parse();
     }
 
+    public String stringify(Object object) {
+        return JsonSerializer.serializeToJson(object);
+    }
+
     private static String readJsonFromFile(String filePath) {
         return HttpRequest.httpRequestSync("GET", filePath, null);
     }

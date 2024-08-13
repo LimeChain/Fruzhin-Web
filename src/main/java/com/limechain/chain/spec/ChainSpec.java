@@ -1,5 +1,6 @@
 package com.limechain.chain.spec;
 
+import com.limechain.teavm.annotation.Reflectable;
 import com.limechain.utils.json.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@Reflectable
 public class ChainSpec implements Serializable {
     private String id;
     private String name;
