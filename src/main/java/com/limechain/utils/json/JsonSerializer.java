@@ -1,6 +1,6 @@
 package com.limechain.utils.json;
 
-import com.limechain.utils.DivLogger;
+import lombok.extern.java.Log;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -11,9 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+@Log
 public class JsonSerializer {
-
-    private static final DivLogger LOGGER = new DivLogger();
 
     static String serializeToJson(Object object) {
         StringBuilder jsonBuilder = new StringBuilder();
@@ -59,7 +58,7 @@ public class JsonSerializer {
                     jsonBuilder.append(",");
                 }
             } catch (IllegalAccessException e) {
-                LOGGER.log(Level.SEVERE, Arrays.toString(e.getStackTrace()));
+                log.log(Level.SEVERE, Arrays.toString(e.getStackTrace()));
             }
         }
 

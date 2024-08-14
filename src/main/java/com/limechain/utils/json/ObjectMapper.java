@@ -1,6 +1,6 @@
 package com.limechain.utils.json;
 
-import com.limechain.utils.DivLogger;
+import lombok.extern.java.Log;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -11,9 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+@Log
 public class ObjectMapper {
-
-    private static final DivLogger LOGGER = new DivLogger();
 
     private final boolean failOnUnknownField;
 
@@ -53,7 +52,7 @@ public class ObjectMapper {
             if (failOnUnknownField) {
                 throw new IllegalStateException("Field " + fieldName + " does not exist in " + clazz.getName());
             } else {
-                LOGGER.log(Level.FINE, "Field " + fieldName + " does not exist in " + clazz.getName());
+                log.log(Level.FINE, "Field " + fieldName + " does not exist in " + clazz.getName());
                 return null;
             }
         }

@@ -142,12 +142,7 @@ public class JsonParser {
 
     private Object parseNumber() {
         int start = index;
-        boolean isValidNumberChar = (Character.isDigit(json.charAt(index))
-            || json.charAt(index) == '-'
-            || json.charAt(index) == '.'
-            || json.charAt(index) == 'e'
-            || json.charAt(index) == 'E');
-        while (index < json.length() && isValidNumberChar) {
+        while (index < json.length() && isValidNumberChar()) {
             index++;
         }
         String numberStr = json.substring(start, index).trim();
@@ -160,6 +155,14 @@ public class JsonParser {
         } catch (NumberFormatException e) {
             throw new RuntimeException("Invalid number format: " + numberStr);
         }
+    }
+
+    private boolean isValidNumberChar() {
+        return (Character.isDigit(json.charAt(index))
+            || json.charAt(index) == '-'
+            || json.charAt(index) == '.'
+            || json.charAt(index) == 'e'
+            || json.charAt(index) == 'E');
     }
 
     private void skipWhitespace() {
