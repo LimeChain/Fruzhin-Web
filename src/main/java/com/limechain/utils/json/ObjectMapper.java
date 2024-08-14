@@ -4,6 +4,7 @@ import com.limechain.utils.DivLogger;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.math.BigInteger;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +68,12 @@ public class ObjectMapper {
             return (T) value;
         } else if (type == Integer.class || type == int.class) {
             return (T) (Integer) ((Number) value).intValue();
+        } else if (type == Long.class || type == long.class) {
+            return (T) (Long) ((Number) value).longValue();
         } else if (type == Double.class || type == double.class) {
             return (T) (Double) ((Number) value).doubleValue();
+        } else if (type == BigInteger.class) {
+            return (T) BigInteger.valueOf((Long) value);
         } else if (type == Boolean.class || type == boolean.class) {
             return (T) value;
         } else if (type == String.class) {
@@ -100,6 +105,7 @@ public class ObjectMapper {
             clazz == Integer.class || clazz == Long.class ||
             clazz == Double.class || clazz == Float.class ||
             clazz == Boolean.class || clazz == Byte.class ||
-            clazz == Short.class || clazz == Character.class;
+            clazz == Short.class || clazz == Character.class ||
+            clazz == BigInteger.class;
     }
 }

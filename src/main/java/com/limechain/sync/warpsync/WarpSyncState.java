@@ -2,12 +2,12 @@ package com.limechain.sync.warpsync;
 
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.network.Network;
-import com.limechain.storage.KVRepository;
+import com.limechain.storage.LocalStorage;
 import com.limechain.storage.block.SyncState;
+import com.limechain.tuple.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
-import com.limechain.tuple.Pair;
 
 import java.math.BigInteger;
 import java.util.Comparator;
@@ -25,7 +25,7 @@ public class WarpSyncState {
 
     private final SyncState syncState;
     private final Network network;
-    private final KVRepository<String, Object> db;
+    private final LocalStorage db;
 
     @Getter
     private boolean warpSyncFragmentsFinished;
@@ -36,15 +36,15 @@ public class WarpSyncState {
     private final PriorityQueue<Pair<BigInteger, Authority[]>> scheduledAuthorityChanges;
 
 
-    public WarpSyncState(SyncState syncState, Network network, KVRepository<String, Object> db) {
+    public WarpSyncState(SyncState syncState, Network network, LocalStorage db) {
         this(syncState,
-                network,
-                db,
-                new HashSet<>(),
-                new PriorityQueue<>(Comparator.comparing(Pair::getValue0)));
+            network,
+            db,
+            new HashSet<>(),
+            new PriorityQueue<>(Comparator.comparing(Pair::getValue0)));
     }
 
-    public WarpSyncState(SyncState syncState, Network network, KVRepository<String, Object> db,
+    public WarpSyncState(SyncState syncState, Network network, LocalStorage db,
                          Set<BigInteger> scheduledRuntimeUpdateBlocks,
                          PriorityQueue<Pair<BigInteger, Authority[]>> scheduledAuthorityChanges) {
         this.syncState = syncState;

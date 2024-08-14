@@ -4,7 +4,7 @@ import com.limechain.teavm.HttpRequest;
 
 public class JsonUtil {
 
-    static Object parseJson(String jsonString) {
+    public static Object parseJson(String jsonString) {
         return new JsonParser(jsonString).parse();
     }
 

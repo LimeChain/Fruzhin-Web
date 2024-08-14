@@ -4,11 +4,10 @@ import com.limechain.chain.ChainService;
 import com.limechain.config.HostConfig;
 import com.limechain.config.SystemInfo;
 import com.limechain.network.Network;
-import com.limechain.storage.KVRepository;
+import com.limechain.storage.LocalStorage;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import com.limechain.sync.warpsync.WarpSyncState;
-import com.limechain.utils.DivLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class CommonConfig {
     public static void start() {
         getBean(SystemInfo.class);
         getBean(HostConfig.class);
-        getBean(KVRepository.class);
+        getBean(LocalStorage.class);
         getBean(WarpSyncMachine.class);
     }
 
@@ -37,7 +36,7 @@ public class CommonConfig {
                     beans.put(beanClass, hostConfig);
                     return hostConfig;
                 case "KVRepository":
-                    KVRepository<String, Object> repository = repository((HostConfig) getBean(HostConfig.class));
+                    LocalStorage repository = repository((HostConfig) getBean(HostConfig.class));
                     beans.put(beanClass, repository);
                     return repository;
                 case "ChainService":
@@ -45,7 +44,7 @@ public class CommonConfig {
                     beans.put(beanClass, chainService);
                     return chainService;
                 case "SyncState":
-                    SyncState syncState = syncState((KVRepository<String, Object>) getBean(KVRepository.class));
+                    SyncState syncState = syncState((LocalStorage) getBean(LocalStorage.class));
                     beans.put(beanClass, syncState);
                     return syncState;
                 case "SystemInfo":
@@ -54,12 +53,12 @@ public class CommonConfig {
                     return systemInfo;
                 case "Network":
                     Network network = network((ChainService) getBean(ChainService.class),
-                        (HostConfig) getBean(HostConfig.class), (KVRepository<String, Object>) getBean(KVRepository.class));
+                        (HostConfig) getBean(HostConfig.class), (LocalStorage) getBean(LocalStorage.class));
                     beans.put(beanClass, network);
                     return network;
                 case "WarpSyncState":
                     WarpSyncState warpSyncState = warpSyncState((Network) getBean(Network.class),
-                        (SyncState) getBean(SyncState.class), (KVRepository<String, Object>) getBean(KVRepository.class));
+                        (SyncState) getBean(SyncState.class), (LocalStorage) getBean(LocalStorage.class));
                     beans.put(beanClass, warpSyncState);
                     return warpSyncState;
                 case "WarpSyncMachine":
@@ -78,7 +77,7 @@ public class CommonConfig {
         return new HostConfig();
     }
 
-    private static KVRepository<String, Object> repository(HostConfig hostConfig) {
+    private static LocalStorage repository(HostConfig hostConfig) {
         return null;//DBInitializer.initialize(hostConfig.getChain());
     }
 
@@ -86,7 +85,7 @@ public class CommonConfig {
         return new ChainService(hostConfig);
     }
 
-    private static SyncState syncState(KVRepository<String, Object> repository) {
+    private static SyncState syncState(LocalStorage repository) {
         return new SyncState(repository);
     }
 
@@ -95,12 +94,12 @@ public class CommonConfig {
     }
 
     private static Network network(ChainService chainService, HostConfig hostConfig,
-                                   KVRepository<String, Object> repository) {
+                                   LocalStorage repository) {
         return new Network(chainService, hostConfig, repository);
     }
 
     private static WarpSyncState warpSyncState(Network network, SyncState syncState,
-                                               KVRepository<String, Object> repository) {
+                                               LocalStorage repository) {
         return new WarpSyncState(syncState, network, repository);
     }
 

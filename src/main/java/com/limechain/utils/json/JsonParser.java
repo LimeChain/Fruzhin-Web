@@ -142,7 +142,7 @@ public class JsonParser {
 
     private Number parseNumber() {
         int start = index;
-        while (Character.isDigit(peek()) || peek() == '-' || peek() == '.' || peek() == 'e' || peek() == 'E') {
+        while (index < json.length() && (Character.isDigit(json.charAt(index)) || json.charAt(index) == '-' || json.charAt(index) == '.' || json.charAt(index) == 'e' || json.charAt(index) == 'E')) {
             index++;
         }
         String numberStr = json.substring(start, index).trim();
