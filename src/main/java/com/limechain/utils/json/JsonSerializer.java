@@ -15,21 +15,45 @@ public class JsonSerializer {
 
     private final static DivLogger LOGGER = new DivLogger();
 
-    // Method to serialize any object to a JSON string
-    public static String serializeToJson(Object object) {
+    static String serializeToJson(Object object) {
         StringBuilder jsonBuilder = new StringBuilder();
+        serializeToJsonInternal(jsonBuilder, object);
+        return jsonBuilder.toString();
+    }
+
+    private static void serializeToJsonInternal(StringBuilder jsonBuilder, Object object) {
+        if (object == null) {
+            jsonBuilder.append("null");
+        } else if (object instanceof String) {
+            jsonBuilder.append("\"").append(object).append("\"");
+        } else if (object instanceof Number || object instanceof Boolean) {
+            jsonBuilder.append(object);
+        } else if (object instanceof byte[]) {
+            appendByteArray(jsonBuilder, (byte[]) object);
+        } else if (object instanceof List) {
+            appendList(jsonBuilder, (List<?>) object);
+        } else if (object instanceof Map) {
+            appendMap(jsonBuilder, (Map<?, ?>) object);
+        } else if (object.getClass().isArray()) {
+            appendArray(jsonBuilder, object);
+        } else {
+            appendObject(jsonBuilder, object);
+        }
+    }
+
+    private static void appendObject(StringBuilder jsonBuilder, Object object) {
         jsonBuilder.append("{");
 
         Field[] fields = object.getClass().getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             try {
-                Field field = fields[i]; // To access private fields
+                Field field = fields[i];
                 field.setAccessible(true);
                 String fieldName = field.getName();
                 Object fieldValue = field.get(object);
 
                 jsonBuilder.append("\"").append(fieldName).append("\":");
-                appendValue(jsonBuilder, fieldValue);
+                serializeToJsonInternal(jsonBuilder, fieldValue);
 
                 if (i < fields.length - 1) {
                     jsonBuilder.append(",");
@@ -40,35 +64,12 @@ public class JsonSerializer {
         }
 
         jsonBuilder.append("}");
-        return jsonBuilder.toString();
     }
 
-    // Helper method to handle different types of values
-    private static void appendValue(StringBuilder jsonBuilder, Object value) {
-        if (value == null) {
-            jsonBuilder.append("null");
-        } else if (value instanceof String) {
-            jsonBuilder.append("\"").append(value).append("\"");
-        } else if (value instanceof Number || value instanceof Boolean) {
-            jsonBuilder.append(value);
-        } else if (value instanceof List) {
-            appendList(jsonBuilder, (List<?>) value);
-        } else if (value instanceof Map) {
-            appendMap(jsonBuilder, (Map<?, ?>) value);
-        } else if (value instanceof byte[]) {
-            appendByteArray(jsonBuilder, (byte[]) value);
-        } else if (value.getClass().isArray()) {
-            appendArray(jsonBuilder, value);
-        } else {
-            jsonBuilder.append(serializeToJson(value)); // Recursively handle nested objects
-        }
-    }
-
-    // Method to serialize a List to JSON
     private static void appendList(StringBuilder jsonBuilder, List<?> list) {
         jsonBuilder.append("[");
         for (int i = 0; i < list.size(); i++) {
-            appendValue(jsonBuilder, list.get(i));
+            serializeToJsonInternal(jsonBuilder, list.get(i));
             if (i < list.size() - 1) {
                 jsonBuilder.append(",");
             }
@@ -76,14 +77,13 @@ public class JsonSerializer {
         jsonBuilder.append("]");
     }
 
-    // Method to serialize a Map to JSON
     private static void appendMap(StringBuilder jsonBuilder, Map<?, ?> map) {
         jsonBuilder.append("{");
         Set<?> keys = map.keySet();
         int i = 0;
         for (Object key : keys) {
             jsonBuilder.append("\"").append(key).append("\":");
-            appendValue(jsonBuilder, map.get(key));
+            serializeToJsonInternal(jsonBuilder, map.get(key));
             if (i < keys.size() - 1) {
                 jsonBuilder.append(",");
             }
@@ -92,12 +92,11 @@ public class JsonSerializer {
         jsonBuilder.append("}");
     }
 
-    // Method to serialize an array to JSON
     private static void appendArray(StringBuilder jsonBuilder, Object array) {
         jsonBuilder.append("[");
         int length = Array.getLength(array);
         for (int i = 0; i < length; i++) {
-            appendValue(jsonBuilder, Array.get(array, i));
+            serializeToJsonInternal(jsonBuilder, Array.get(array, i));
             if (i < length - 1) {
                 jsonBuilder.append(",");
             }
