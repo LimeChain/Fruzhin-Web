@@ -140,9 +140,14 @@ public class JsonParser {
         return sb.toString();
     }
 
-    private Number parseNumber() {
+    private Object parseNumber() {
         int start = index;
-        while (index < json.length() && (Character.isDigit(json.charAt(index)) || json.charAt(index) == '-' || json.charAt(index) == '.' || json.charAt(index) == 'e' || json.charAt(index) == 'E')) {
+        boolean isValidNumberChar = (Character.isDigit(json.charAt(index))
+            || json.charAt(index) == '-'
+            || json.charAt(index) == '.'
+            || json.charAt(index) == 'e'
+            || json.charAt(index) == 'E');
+        while (index < json.length() && isValidNumberChar) {
             index++;
         }
         String numberStr = json.substring(start, index).trim();
@@ -150,7 +155,7 @@ public class JsonParser {
             if (numberStr.contains(".") || numberStr.contains("e") || numberStr.contains("E")) {
                 return Double.parseDouble(numberStr);
             } else {
-                return Long.parseLong(numberStr);
+                return numberStr;
             }
         } catch (NumberFormatException e) {
             throw new RuntimeException("Invalid number format: " + numberStr);

@@ -4,6 +4,7 @@ import com.limechain.utils.DivLogger;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Base64;
 import java.util.List;
@@ -67,13 +68,18 @@ public class ObjectMapper {
         if (type.isInstance(value)) {
             return (T) value;
         } else if (type == Integer.class || type == int.class) {
-            return (T) (Integer) ((Number) value).intValue();
+            return handleWholeNumber(value, (long) Integer.MIN_VALUE, (long) Integer.MIN_VALUE);
         } else if (type == Long.class || type == long.class) {
-            return (T) (Long) ((Number) value).longValue();
+            return handleWholeNumber(value, Long.MIN_VALUE, Long.MAX_VALUE);
         } else if (type == Double.class || type == double.class) {
-            return (T) (Double) ((Number) value).doubleValue();
+            BigDecimal bigDecimalValue = new BigDecimal((String) value);
+            double doubleValue = bigDecimalValue.doubleValue();
+            if (doubleValue == Double.POSITIVE_INFINITY || doubleValue == Double.NEGATIVE_INFINITY) {
+                throw new ArithmeticException("Value out of range for Double: " + value);
+            }
+            return (T) Double.valueOf(doubleValue);
         } else if (type == BigInteger.class) {
-            return (T) BigInteger.valueOf((Long) value);
+            return (T) new BigInteger((String) value);
         } else if (type == Boolean.class || type == boolean.class) {
             return (T) value;
         } else if (type == String.class) {
@@ -89,6 +95,16 @@ public class ObjectMapper {
         }
 
         throw new RuntimeException("Unsupported field type: " + type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T handleWholeNumber(Object value, Long min, Long max) {
+        BigInteger bigIntValue = new BigInteger((String) value);
+        if (bigIntValue.compareTo(BigInteger.valueOf(min)) < 0 ||
+            bigIntValue.compareTo(BigInteger.valueOf(max)) > 0) {
+            throw new ArithmeticException("Value out of range number type: " + value);
+        }
+        return (T) Integer.valueOf(bigIntValue.intValue());
     }
 
     private Object convertArray(Class<?> componentType, List<?> jsonArray) {
