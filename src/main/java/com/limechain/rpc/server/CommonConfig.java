@@ -4,7 +4,6 @@ import com.limechain.chain.ChainService;
 import com.limechain.config.HostConfig;
 import com.limechain.config.SystemInfo;
 import com.limechain.network.Network;
-import com.limechain.storage.LocalStorage;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import com.limechain.sync.warpsync.WarpSyncState;
@@ -22,7 +21,6 @@ public class CommonConfig {
     public static void start() {
         getBean(SystemInfo.class);
         getBean(HostConfig.class);
-        getBean(LocalStorage.class);
         getBean(WarpSyncMachine.class);
     }
 
@@ -35,16 +33,12 @@ public class CommonConfig {
                     HostConfig hostConfig = hostConfig();
                     beans.put(beanClass, hostConfig);
                     return hostConfig;
-                case "KVRepository":
-                    LocalStorage repository = repository((HostConfig) getBean(HostConfig.class));
-                    beans.put(beanClass, repository);
-                    return repository;
                 case "ChainService":
                     ChainService chainService = chainService((HostConfig) getBean(HostConfig.class));
                     beans.put(beanClass, chainService);
                     return chainService;
                 case "SyncState":
-                    SyncState syncState = syncState((LocalStorage) getBean(LocalStorage.class));
+                    SyncState syncState = syncState();
                     beans.put(beanClass, syncState);
                     return syncState;
                 case "SystemInfo":
@@ -53,12 +47,12 @@ public class CommonConfig {
                     return systemInfo;
                 case "Network":
                     Network network = network((ChainService) getBean(ChainService.class),
-                        (HostConfig) getBean(HostConfig.class), (LocalStorage) getBean(LocalStorage.class));
+                        (HostConfig) getBean(HostConfig.class));
                     beans.put(beanClass, network);
                     return network;
                 case "WarpSyncState":
                     WarpSyncState warpSyncState = warpSyncState((Network) getBean(Network.class),
-                        (SyncState) getBean(SyncState.class), (LocalStorage) getBean(LocalStorage.class));
+                        (SyncState) getBean(SyncState.class));
                     beans.put(beanClass, warpSyncState);
                     return warpSyncState;
                 case "WarpSyncMachine":
@@ -77,30 +71,24 @@ public class CommonConfig {
         return new HostConfig();
     }
 
-    private static LocalStorage repository(HostConfig hostConfig) {
-        return null;//DBInitializer.initialize(hostConfig.getChain());
-    }
-
     private static ChainService chainService(HostConfig hostConfig) {
         return new ChainService(hostConfig);
     }
 
-    private static SyncState syncState(LocalStorage repository) {
-        return new SyncState(repository);
+    private static SyncState syncState() {
+        return new SyncState();
     }
 
     private static SystemInfo systemInfo(HostConfig hostConfig, SyncState syncState) {
         return new SystemInfo(hostConfig, syncState);
     }
 
-    private static Network network(ChainService chainService, HostConfig hostConfig,
-                                   LocalStorage repository) {
-        return new Network(chainService, hostConfig, repository);
+    private static Network network(ChainService chainService, HostConfig hostConfig) {
+        return new Network(chainService, hostConfig);
     }
 
-    private static WarpSyncState warpSyncState(Network network, SyncState syncState,
-                                               LocalStorage repository) {
-        return new WarpSyncState(syncState, network, repository);
+    private static WarpSyncState warpSyncState(Network network, SyncState syncState) {
+        return new WarpSyncState(syncState, network);
     }
 
     private static WarpSyncMachine warpSyncMachine(Network network, ChainService chainService, SyncState syncState,

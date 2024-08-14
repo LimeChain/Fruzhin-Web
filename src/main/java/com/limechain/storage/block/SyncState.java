@@ -20,7 +20,6 @@ import java.util.Arrays;
 @Log
 public class SyncState {
 
-    private final LocalStorage repository;
     private BigInteger lastFinalizedBlockNumber;
     private final BigInteger startingBlock;
     private final Hash256 genesisBlockHash;
@@ -30,9 +29,8 @@ public class SyncState {
     private BigInteger latestRound;
     private BigInteger setId;
 
-    public SyncState(LocalStorage repository) {
+    public SyncState() {
         this.genesisBlockHash = GenesisBlockHash.POLKADOT;
-        this.repository = repository;
 
         loadState();
         this.startingBlock = this.lastFinalizedBlockNumber;
@@ -41,16 +39,11 @@ public class SyncState {
     private void loadState() {
         this.lastFinalizedBlockNumber = LocalStorage.find(
             DBConstants.LAST_FINALIZED_BLOCK_NUMBER, BigInteger.class).orElse(BigInteger.ZERO);
-        System.out.println(lastFinalizedBlockHash);
         this.lastFinalizedBlockHash = new Hash256(LocalStorage.find(
             DBConstants.LAST_FINALIZED_BLOCK_HASH, byte[].class).orElse(genesisBlockHash.getBytes()));
-        System.out.println(lastFinalizedBlockHash);
         this.authoritySet = LocalStorage.find(DBConstants.AUTHORITY_SET, Authority[].class).orElse(new Authority[0]);
-        System.out.println(Arrays.toString(authoritySet));
         this.latestRound = LocalStorage.find(DBConstants.LATEST_ROUND, BigInteger.class).orElse(BigInteger.ONE);
-        System.out.println(latestRound);
         this.setId = LocalStorage.find(DBConstants.SET_ID, BigInteger.class).orElse(BigInteger.ZERO);
-        System.out.println(setId);
     }
 
     public void persistState() {

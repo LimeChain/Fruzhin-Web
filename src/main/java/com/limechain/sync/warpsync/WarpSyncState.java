@@ -2,7 +2,6 @@ package com.limechain.sync.warpsync;
 
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.network.Network;
-import com.limechain.storage.LocalStorage;
 import com.limechain.storage.block.SyncState;
 import com.limechain.tuple.Pair;
 import lombok.Getter;
@@ -25,7 +24,6 @@ public class WarpSyncState {
 
     private final SyncState syncState;
     private final Network network;
-    private final LocalStorage db;
 
     @Getter
     private boolean warpSyncFragmentsFinished;
@@ -36,20 +34,18 @@ public class WarpSyncState {
     private final PriorityQueue<Pair<BigInteger, Authority[]>> scheduledAuthorityChanges;
 
 
-    public WarpSyncState(SyncState syncState, Network network, LocalStorage db) {
+    public WarpSyncState(SyncState syncState, Network network) {
         this(syncState,
             network,
-            db,
             new HashSet<>(),
             new PriorityQueue<>(Comparator.comparing(Pair::getValue0)));
     }
 
-    public WarpSyncState(SyncState syncState, Network network, LocalStorage db,
+    public WarpSyncState(SyncState syncState, Network network,
                          Set<BigInteger> scheduledRuntimeUpdateBlocks,
                          PriorityQueue<Pair<BigInteger, Authority[]>> scheduledAuthorityChanges) {
         this.syncState = syncState;
         this.network = network;
-        this.db = db;
         this.scheduledRuntimeUpdateBlocks = scheduledRuntimeUpdateBlocks;
         this.scheduledAuthorityChanges = scheduledAuthorityChanges;
     }
