@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 public class JsonSerializer {
 
-    private final static DivLogger LOGGER = new DivLogger();
+    private static final DivLogger LOGGER = new DivLogger();
 
     static String serializeToJson(Object object) {
         StringBuilder jsonBuilder = new StringBuilder();
@@ -59,7 +59,7 @@ public class JsonSerializer {
                     jsonBuilder.append(",");
                 }
             } catch (IllegalAccessException e) {
-                LOGGER.log(Level.FINE, Arrays.toString(e.getStackTrace()));
+                LOGGER.log(Level.SEVERE, Arrays.toString(e.getStackTrace()));
             }
         }
 

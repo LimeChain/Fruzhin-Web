@@ -15,11 +15,7 @@ public class JsonParser {
         this.index = 0;
     }
 
-    Map<String, Object> parse() {
-        return (Map<String, Object>) parseValue();
-    }
-
-    private Object parseValue() {
+    Object parse() {
         skipWhitespace();
         char currentChar = peek();
         if (currentChar == '{') {
@@ -60,7 +56,7 @@ public class JsonParser {
             }
             index++; // Skip ':'
             skipWhitespace();
-            Object value = parseValue();
+            Object value = parse();
             object.put(key, value);
             skipWhitespace();
             char currentChar = peek();
@@ -85,7 +81,7 @@ public class JsonParser {
         }
         while (true) {
             skipWhitespace();
-            Object value = parseValue();
+            Object value = parse();
             array.add(value);
             skipWhitespace();
             char currentChar = peek();
