@@ -4,6 +4,9 @@ import com.limechain.teavm.HttpRequest;
 
 public class JsonUtil {
 
+    // Prevents instantiation
+    private JsonUtil() {}
+
     public static Object parseJson(String jsonString) {
         return new JsonParser(jsonString).parse();
     }
