@@ -4,6 +4,9 @@ import com.limechain.teavm.HttpRequest;
 
 public class JsonUtil {
 
+    // Prevents instantiation
+    private JsonUtil() {}
+
     public static Object parseJson(String jsonString) {
         return new JsonParser(jsonString).parse();
     }
@@ -13,6 +16,6 @@ public class JsonUtil {
     }
 
     public static String readJsonFromFile(String filePath) {
-        return HttpRequest.httpRequestSync("GET", filePath, null);
+        return HttpRequest.asyncHttpRequest("GET", filePath, null);
     }
 }
