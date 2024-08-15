@@ -5,7 +5,7 @@ async function asyncHttpRequest(method = 'GET', url, body = null, callback) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: method === 'POST' ? JSON.stringify(body) : undefined
+            body: method === 'POST' ? body : undefined
         });
 
         if (!response.ok) {
@@ -13,10 +13,10 @@ async function asyncHttpRequest(method = 'GET', url, body = null, callback) {
             return;
         }
 
-        let result = await response.text();
+        const result = await response.text();
         callback(null, result);
 
     } catch (error) {
-        callback(new Error(`Error during sending request: ${error.message}`), null);
+        callback(new Error(`Error during sending request: ${error?.message}`), null);
     }
 }
