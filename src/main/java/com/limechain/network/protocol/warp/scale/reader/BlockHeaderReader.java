@@ -12,12 +12,17 @@ public class BlockHeaderReader implements ScaleReader<BlockHeader> {
     @Override
     public BlockHeader read(ScaleCodecReader reader) {
         BlockHeader blockHeader = new BlockHeader();
+        System.out.println("BlockHeaderReader.read");
         blockHeader.setParentHash(new Hash256(reader.readUint256()));
+        System.out.println("BlockHeaderReader.setParentHash");
         // NOTE: Usage of BlockNumberReader is intentionally omitted here,
         //  since we want this to be a compact int, not a var size int
         blockHeader.setBlockNumber(BigInteger.valueOf(reader.readCompactInt()));
+        System.out.println("BlockHeaderReader.setBlockNumber");
         blockHeader.setStateRoot(new Hash256(reader.readUint256()));
+        System.out.println("BlockHeaderReader.setStateRoot");
         blockHeader.setExtrinsicsRoot(new Hash256(reader.readUint256()));
+        System.out.println("BlockHeaderReader.setExtrinsicsRoot");
 
         var digestCount = reader.readCompactInt();
         HeaderDigest[] digests = new HeaderDigest[digestCount];
@@ -26,6 +31,7 @@ public class BlockHeaderReader implements ScaleReader<BlockHeader> {
         }
 
         blockHeader.setDigest(digests);
+        System.out.println("BlockHeaderReader.setDigest");
 
         return blockHeader;
     }

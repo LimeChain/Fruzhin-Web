@@ -4,6 +4,8 @@ import com.limechain.chain.Chain;
 import com.limechain.chain.ChainService;
 import com.limechain.config.HostConfig;
 import com.limechain.network.kad.KademliaService;
+import com.limechain.network.protocol.warp.WarpSyncService;
+import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
 import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncState;
 import lombok.Getter;
@@ -50,14 +52,17 @@ public class Network {
                                      HostConfig hostConfig) {
 
 //
-//        String chainId = chainService.getChainSpec().getProtocolId();
-//        String warpProtocolId = ProtocolUtils.getWarpSyncProtocol(chainId);
+        String chainId = chainService.getChainSpec().getProtocolId();
+        String warpProtocolId = ProtocolUtils.getWarpSyncProtocol(chainId);
 //        String lightProtocolId = ProtocolUtils.getLightMessageProtocol(chainId);
 //        String blockAnnounceProtocolId = ProtocolUtils.getBlockAnnounceProtocol(chainId);
 //        String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol(chainId);
 
         kademliaService = new KademliaService();
+        warpSyncService = new WarpSyncService(warpProtocolId);
     }
+
+    WarpSyncService warpSyncService;
 
 //    private Ed25519PrivateKey loadPrivateKeyFromDB(KVRepository<String, Object> repository) {
 //        Ed25519PrivateKey privateKey;
@@ -110,6 +115,7 @@ public class Network {
 //        if (connectionManager.getPeerIds().isEmpty()) return;
 //        this.currentSelectedPeer = connectionManager.getPeerIds().stream()
 //                .skip(RANDOM.nextInt(connectionManager.getPeerIds().size())).findAny().orElse(null);
+        kademliaService.updateSuccessfulBootNodes();
     }
 
 //    public String getPeerId() {
@@ -138,7 +144,7 @@ public class Network {
         }
         if (getPeersCount() >= REPLICATION) {
             log.log(Level.INFO,
-                "Connections have reached replication factor(" + REPLICATION + "). " +
+                    "Connections have reached replication factor(" + REPLICATION + "). " +
                     "No need to search for new ones yet.");
             return;
         }
@@ -177,7 +183,7 @@ public class Network {
 //        }
 //    }
 
-//    public BlockResponse syncBlock(PeerId peerId, BigInteger lastBlockNumber) {
+    //    public BlockResponse syncBlock(PeerId peerId, BigInteger lastBlockNumber) {
 //        this.currentSelectedPeer = peerId;
 //        // TODO: fields, hash, direction and maxBlocks values not verified
 //        // TODO: when debugging could not get a value returned
@@ -202,14 +208,12 @@ public class Network {
 //        );
 //    }
 //
-//    public WarpSyncResponse makeWarpSyncRequest(String blockHash) {
+    public WarpSyncResponse makeWarpSyncRequest(String blockHash) {
 //        if (isPeerInvalid()) return null;
-//
-//        return this.warpSyncService.getProtocol().warpSyncRequest(
-//                this.host,
-//                this.currentSelectedPeer,
-//                blockHash);
-//    }
+
+        return this.warpSyncService.getProtocol().warpSyncRequest(
+                blockHash);
+    }
 //
 //    public LightClientMessage.Response makeRemoteReadRequest(String blockHash, String[] keys) {
 //        if (isPeerInvalid()) return null;

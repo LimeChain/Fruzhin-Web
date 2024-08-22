@@ -54,6 +54,7 @@ public class WarpSyncMachine {
     }
 
     public void handleState() {
+        System.out.println("Warp sync action" + warpSyncAction.getClass().getSimpleName());
         warpSyncAction.handle(this);
     }
 
@@ -72,14 +73,14 @@ public class WarpSyncMachine {
         final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
 
         // Always start with requesting fragments
-        log.log(Level.INFO, "Requesting fragments...");
+        log.log(Level.INFO, "Requesting fragments... " + initStateHash.toString());
         this.networkService.updateCurrentSelectedPeerWithNextBootnode();
         this.warpSyncAction = new RequestFragmentsAction(initStateHash);
 
 //        new Thread(() -> {
 //            while (this.warpSyncAction.getClass() != FinishedAction.class) {
-//                this.handleState();
-//                this.nextState();
+                this.handleState();
+                this.nextState();
 //            }
 //
 //            finishWarpSync();

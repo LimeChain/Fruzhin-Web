@@ -3,8 +3,6 @@ package com.limechain.utils;
 import lombok.experimental.UtilityClass;
 import org.teavm.jso.JSBody;
 
-import java.util.regex.Pattern;
-
 @UtilityClass
 public class StringUtils {
     public static final String HEX_PREFIX = "0x";
@@ -29,10 +27,10 @@ public class StringUtils {
         return fromHex(hex);
     }
 
-    @JSBody(params = { "hex" }, script = " let bytes = [];" +
-                     "    for (let c = 0; c < hex.length; c += 2)" +
-                     "        bytes.push(parseInt(hex.substr(c, 2), 16));" +
-                     "    return bytes;")
+    @JSBody(params = {"hex"}, script = " let bytes = [];" +
+                                       "    for (let c = 0; c < hex.length; c += 2)" +
+                                       "        bytes.push(parseInt(hex.substr(c, 2), 16));" +
+                                       "    return bytes;")
     public static native byte[] fromHex(String hex);
 
     /**
@@ -49,21 +47,16 @@ public class StringUtils {
         return hex;
     }
 
-    /**
-     * Converts a string to its hexadecimal representation.
-     * Each character of the input string is converted to its corresponding two-digit hex value.
-     *
-     * @param key the string to convert to hexadecimal
-     * @return the hexadecimal representation of the input string
-     */
-    public static String toHex(String key) {
-        StringBuilder sb = new StringBuilder();
-        char[] ch = key.toCharArray();
-        for (char c : ch) {
-            String hexString = Integer.toHexString(c);
-            sb.append(hexString);
+    private final String hexArray = "0123456789abcdef";
+
+    public static String toHex(byte[] bytes) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i != bytes.length; i++) {
+            int v = bytes[i] & 0xff;
+            buf.append(hexArray.charAt(v >> 4));
+            buf.append(hexArray.charAt(v & 0xf));
         }
-        return sb.toString();
+        return buf.toString();
     }
 
     /**
@@ -74,6 +67,6 @@ public class StringUtils {
      * @return the "0x" prefixed hexadecimal string
      */
     public static String toHexWithPrefix(byte[] bytes) {
-        return HEX_PREFIX + "Hex.toHexString(bytes)";
+        return HEX_PREFIX + toHex(bytes);
     }
 }

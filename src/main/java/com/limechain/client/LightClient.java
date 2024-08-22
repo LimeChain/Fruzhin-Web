@@ -33,15 +33,15 @@ public class LightClient implements HostNode {
     @SneakyThrows
     public void start() {
         this.network.start();
-
+        System.out.println("Network started");
         while (true) {
+            this.network.updateCurrentSelectedPeer();
             if (this.network.getKademliaService().getSuccessfulBootNodes() > 0) {
                 log.log(Level.INFO, "Node successfully connected to a peer! Sync can start!");
                 this.warpSyncMachine = AppBean.getBean(WarpSyncMachine.class);
+                System.out.println("Starting warp sync machine...");
                 this.warpSyncMachine.start();
                 break;
-            } else {
-                this.network.updateCurrentSelectedPeer();
             }
             log.log(Level.INFO, "Waiting for peer connection...");
             Thread.sleep(10000);

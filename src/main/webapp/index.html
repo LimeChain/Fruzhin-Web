@@ -15,6 +15,8 @@
     <script src="https://unpkg.com/it-protobuf-stream/dist/index.min.js"></script>
     <!--    <script src="" defer></script>-->
     <script src="https://unpkg.com/libp2p/dist/index.min.js"></script>
+    <script src="https://unpkg.com/it-pipe/dist/index.min.js"></script>
+    <script src="https://unpkg.com/it-pb-stream/dist/index.min.js"></script>
     <script src=""></script>
     <script type="text/javascript" charset="utf-8" src="js/fruzhin.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/http.js"></script>
@@ -47,13 +49,17 @@
             services: {
                 identify: Libp2PIdentify.identify(),
                 ping: Libp2PPing.ping(),
-                dht: Libp2PKadDht.kadDHT({protocol: "dot/dht/1.0.0"}),
+                dht: Libp2PKadDht.kadDHT({protocol: "/dot/kad"}),
                 pubsub: ChainsafeLibp2PGossipsub.gossipsub(),
             }
         };
 
         libp = await Libp2P.createLibp2p(test);
         libp.start();
+
+        // libp.addEventListener('peer:discovery', (evt) => console.log('Discovered:', evt.detail.id.toString()))
+        // libp.addEventListener('peer:connect', (evt) => console.log('Connected:', evt.detail.toString()))
+        // libp.addEventListener('peer:disconnect', (evt) => console.log('Disconnected:', evt.detail.toString()))
 
         // let pbStream = ItProtobufStream.pbStream;
         //

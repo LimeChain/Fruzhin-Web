@@ -1,5 +1,7 @@
 package com.limechain.sync.warpsync.action;
 
+import com.limechain.exception.global.MissingObjectException;
+import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
 import com.limechain.polkaj.Hash256;
 import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncMachine;
@@ -13,7 +15,7 @@ public class RequestFragmentsAction implements WarpSyncAction {
 
     private final WarpSyncState warpSyncState;
     private final Hash256 blockHash;
-//    private WarpSyncResponse result;
+    //    private WarpSyncResponse result;
     private Exception error;
 
     public RequestFragmentsAction(Hash256 blockHash) {
@@ -37,7 +39,7 @@ public class RequestFragmentsAction implements WarpSyncAction {
             }
         }
 //        if (this.result != null) {
-            sync.setWarpSyncAction(new VerifyJustificationAction());
+        sync.setWarpSyncAction(new VerifyJustificationAction());
 //            return;
 //        }
         log.log(Level.WARNING, "RequestFragmentsState.next() called without result or error set.");
@@ -45,10 +47,10 @@ public class RequestFragmentsAction implements WarpSyncAction {
 
     @Override
     public void handle(WarpSyncMachine sync) {
-//        WarpSyncResponse resp = null;
+        WarpSyncResponse resp = null;
 //        for (int i = 0; i < sync.getNetworkService().getKademliaService().getBootNodePeerIds().size(); i++) {
 //            try {
-//                resp = sync.getNetworkService().makeWarpSyncRequest(blockHash.toString());
+        resp = sync.getNetworkService().makeWarpSyncRequest(blockHash.toString());
 //                break;
 //            } catch (Exception e) {
 //                if (!sync.getNetworkService().updateCurrentSelectedPeerWithBootnode(i)) {
@@ -57,28 +59,28 @@ public class RequestFragmentsAction implements WarpSyncAction {
 //                }
 //            }
 //        }
-//        try {
-//            if (resp == null) {
-//                throw new MissingObjectException("No response received.");
-//            }
-//
-//            log.log(Level.INFO, "Successfully received fragments from peer "
-//                                + sync.getNetworkService().getCurrentSelectedPeer());
-//            if (resp.getFragments().length == 0) {
-//                log.log(Level.WARNING, "No fragments received.");
-//                return;
-//            }
-//            warpSyncState.setWarpSyncFragmentsFinished(resp.isFinished());
+        try {
+            if (resp == null) {
+                throw new MissingObjectException("No response received.");
+            }
+
+            log.log(Level.INFO, "Successfully received fragments from peer "
+                    /*                                + sync.getNetworkService().getCurrentSelectedPeer()*/);
+            if (resp.getFragments().length == 0) {
+                log.log(Level.WARNING, "No fragments received.");
+                return;
+            }
+            warpSyncState.setWarpSyncFragmentsFinished(resp.isFinished());
 //            sync.setFragmentsQueue(new LinkedBlockingQueue<>(
 //                    Arrays.stream(resp.getFragments()).toList())
 //            );
-//
+
 //            this.result = resp;
-//        } catch (Exception e) {
-//            // TODO: Set error state, next() will use to transition to correct next state.
-//            // This error state could be either recoverable or irrecoverable.
-//            log.log(Level.WARNING, "Error while requesting fragments: " + e.getMessage());
-//            this.error = e;
-//        }
+        } catch (Exception e) {
+            // TODO: Set error state, next() will use to transition to correct next state.
+            // This error state could be either recoverable or irrecoverable.
+            log.log(Level.WARNING, "Error while requesting fragments: " + e.getMessage());
+            this.error = e;
+        }
     }
 }

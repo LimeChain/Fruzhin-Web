@@ -29,7 +29,7 @@ public class ScaleCodecReader {
      * @return true if has more elements
      */
     public boolean hasNext() {
-        return pos < source.length;
+        return true;//pos < source.length;
     }
 
     /**
