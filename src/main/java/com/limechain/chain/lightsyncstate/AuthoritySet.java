@@ -4,11 +4,13 @@ import com.limechain.polkaj.Hash256;
 import lombok.Getter;
 import lombok.Setter;
 import com.limechain.tuple.Pair;
+import lombok.ToString;
 
 import java.math.BigInteger;
 
 @Getter
 @Setter
+@ToString
 public class AuthoritySet {
     private Authority[] currentAuthorities;
     private BigInteger setId;

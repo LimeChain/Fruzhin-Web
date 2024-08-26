@@ -5,7 +5,7 @@ import com.limechain.network.protocol.NetworkService;
 public class WarpSyncService extends NetworkService<WarpSync> {
 
     public WarpSyncService(String protocolId) {
-        this.protocol = new WarpSync(protocolId, new WarpSyncProtocol());
+        this.protocol = new WarpSync(protocolId);
     }
 
 }

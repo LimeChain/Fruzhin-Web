@@ -209,8 +209,6 @@ public class Network {
 //    }
 //
     public WarpSyncResponse makeWarpSyncRequest(String blockHash) {
-//        if (isPeerInvalid()) return null;
-
         return this.warpSyncService.getProtocol().warpSyncRequest(
                 blockHash);
     }

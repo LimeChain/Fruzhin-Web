@@ -80,7 +80,7 @@ public class SyncState {
     public void setLightSyncState(LightSyncState initState) {
         this.setId = initState.getGrandpaAuthoritySet().getSetId();
         setAuthoritySet(initState.getGrandpaAuthoritySet().getCurrentAuthorities());
-//        finalizeHeader(initState.getFinalizedBlockHeader());
+        finalizeHeader(initState.getFinalizedBlockHeader());
     }
 
     public String getStateRoot() {

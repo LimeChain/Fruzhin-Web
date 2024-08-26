@@ -3,73 +3,38 @@ package com.limechain.network.protocol.warp;
 import com.limechain.network.protocol.warp.dto.WarpSyncRequest;
 import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
 import com.limechain.network.protocol.warp.scale.reader.WarpSyncResponseScaleReader;
-import com.limechain.network.wrapper.Stream;
 import com.limechain.polkaj.reader.ScaleCodecReader;
 import com.limechain.utils.StringUtils;
 import org.teavm.jso.JSBody;
-import org.teavm.jso.core.JSArray;
 import org.teavm.jso.core.JSPromise;
+import org.teavm.jso.core.JSString;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
-public class WarpSyncProtocol /*extends ProtocolHandler<WarpSyncController>*/ {
-    // Sizes taken from smoldot
-    public static final int MAX_REQUEST_SIZE = 32;
-    public static final int MAX_RESPONSE_SIZE = 16 * 1024 * 1024;
+public class WarpSyncProtocol {
 
     public WarpSyncProtocol() {
-//        super(MAX_REQUEST_SIZE, MAX_RESPONSE_SIZE);
     }
 
-    /*@Override
-    protected CompletableFuture<WarpSyncController> onStartInitiator(Stream stream) {
-        stream.pushHandler(new Leb128LengthFrameDecoder());
-        stream.pushHandler(new WarpSyncResponseDecoder());
-
-        stream.pushHandler(new Leb128LengthFrameEncoder());
-        stream.pushHandler(new ByteArrayEncoder());
-        WarpSyncProtocol.Sender handler = new WarpSyncProtocol.Sender(stream);
-        stream.pushHandler(handler);
-        return CompletableFuture.completedFuture(handler);
-    }*/
-
     static class Sender implements WarpSyncController {
-        public static final int MAX_QUEUE_SIZE = 50;
-//        private final LinkedBlockingDeque<CompletableFuture<WarpSyncResponse>> queue =
-//                new LinkedBlockingDeque<>(MAX_QUEUE_SIZE);
 
         public Sender() {
         }
 
-        //        @Override
-        public void onMessage(Stream stream, WarpSyncResponse msg) {
-//            Objects.requireNonNull(queue.poll()).complete(msg);
-//            stream.closeWrite();
-        }
-
         @Override
         public WarpSyncResponse send(WarpSyncRequest req, String protocolId) {
-            System.out.println("Request: " + req.getBlockHash());
             final var lock = new Object();
 
-            JSPromise<String> objectJSPromise =
+            AtomicReference<byte[]> response = new AtomicReference<>();
+            JSPromise<JSString> objectJSPromise =
                     sendRequest(StringUtils.toHex(req.getBlockHash().getBytes()), protocolId);
 
             objectJSPromise.then((ttt) -> {
-                System.out.println("Received response: " + ttt);
-                System.out.println("Received response len: " + ttt.length());
-                byte[] bytes = StringUtils.fromHex(ttt);
-                System.out.println("Received response: " + bytes);
-                System.out.println("Received response len: " + bytes.length);
-
                 synchronized (lock) {
-//                    System.out.println("Received response: " + bytes.length + "  " + bytes);
-                    ScaleCodecReader scaleCodecReader = new ScaleCodecReader(bytes);
-                    WarpSyncResponse responseaa = new WarpSyncResponseScaleReader().read(scaleCodecReader);
-                    System.out.println(responseaa);
-//                    response.set(result);
+                    String str = ttt.stringValue();
+                    byte[] bytes = StringUtils.fromHex(str);
+
+                    response.set(bytes);
                     lock.notify();
                 }
                 return null;
@@ -78,16 +43,14 @@ public class WarpSyncProtocol /*extends ProtocolHandler<WarpSyncController>*/ {
             synchronized (lock) {
                 try {
                     lock.wait();
-//                    byte[] bytes = response.get();
-//                    System.out.println("Received response: " + /*bytes.length +*/ "  " + bytes);
-//                    ScaleCodecReader scaleCodecReader = new ScaleCodecReader(bytes);
-//                    WarpSyncResponse responseaa = new WarpSyncResponseScaleReader().read(scaleCodecReader);
-//                    System.out.println(responseaa);
+                    byte[] bytes = response.get();
+                    ScaleCodecReader scaleCodecReader = new ScaleCodecReader(bytes);
+
+                    return new WarpSyncResponseScaleReader().read(scaleCodecReader);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-            return null;
         }
 
         @JSBody(params = {"blockHash", "protocolId"}, script = "return (async () => {" +
@@ -95,9 +58,9 @@ public class WarpSyncProtocol /*extends ProtocolHandler<WarpSyncController>*/ {
                                                                "    let stream = await ItPbStream.pbStream(await libp.dialProtocol(peer, protocolId));" +
                                                                "    stream.writeLP(new Uint8Array([...blockHash.matchAll(/../g)].map(m => parseInt(m[0], 16))));" +
                                                                "    let bytes = (await stream.readLP()).subarray();" +
-                                                               "    return [...bytes].map(n => n.toString(16)).join('');" +
+                                                               "    return [...bytes].map(n => n.toString(16).padStart(2, '0')).join('');" +
                                                                "})()")
-        private static native JSPromise<String> sendRequest(String blockHash, String protocolId);
+        private static native JSPromise<JSString> sendRequest(String blockHash, String protocolId);
 
     }
 }

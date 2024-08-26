@@ -5,12 +5,14 @@ import com.limechain.polkaj.Hash256;
 import com.limechain.utils.scale.ScaleUtils;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 
 @Setter
 @Getter
+@ToString
 public class BlockHeader {
     // TODO: Make this const configurable
     public static final int BLOCK_NUMBER_SIZE = 4;

@@ -2,7 +2,14 @@ package com.limechain.sync.warpsync;
 
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.network.Network;
+import com.limechain.network.protocol.warp.dto.ConsensusEngine;
+import com.limechain.network.protocol.warp.dto.HeaderDigest;
+import com.limechain.polkaj.reader.ScaleCodecReader;
 import com.limechain.storage.block.SyncState;
+import com.limechain.sync.warpsync.dto.AuthoritySetChange;
+import com.limechain.sync.warpsync.dto.GrandpaDigestMessageType;
+import com.limechain.sync.warpsync.scale.ForcedChangeReader;
+import com.limechain.sync.warpsync.scale.ScheduledChangeReader;
 import com.limechain.tuple.Pair;
 import lombok.Getter;
 import lombok.Setter;
@@ -174,51 +181,51 @@ public class WarpSyncState {
      * @param headerDigests digest of the block header
      * @param blockNumber   block that contains the digest
      */
-//    public void handleAuthorityChanges(HeaderDigest[] headerDigests, BigInteger blockNumber) {
-//        // Update authority set and set id
-//        AuthoritySetChange authorityChanges;
-//        for (HeaderDigest digest : headerDigests) {
-//            if (digest.getId() == ConsensusEngine.GRANDPA) {
-//                ScaleCodecReader reader = new ScaleCodecReader(digest.getMessage());
-//                GrandpaDigestMessageType type = GrandpaDigestMessageType.fromId(reader.readByte());
-//
-//                if (type == null) {
-//                    log.log(Level.SEVERE, "Could not get grandpa message type");
-//                    throw new IllegalStateException("Unknown grandpa message type");
-//                }
-//
-//                switch (type) {
-//                    case SCHEDULED_CHANGE -> {
-//                        ScheduledChangeReader authorityChangesReader = new ScheduledChangeReader();
-//                        authorityChanges = authorityChangesReader.read(reader);
-//                        scheduledAuthorityChanges
-//                                .add(new Pair<>(blockNumber.add(authorityChanges.getDelay()),
-//                                        authorityChanges.getAuthorities()));
-//                        return;
-//                    }
-//                    case FORCED_CHANGE -> {
-//                        ForcedChangeReader authorityForcedChangesReader = new ForcedChangeReader();
-//                        authorityChanges = authorityForcedChangesReader.read(reader);
-//                        scheduledAuthorityChanges
-//                                .add(new Pair<>(blockNumber.add(authorityChanges.getDelay()),
-//                                        authorityChanges.getAuthorities()));
-//                        return;
-//                    }
-//                    case ON_DISABLED -> {
-//                        log.log(Level.SEVERE, "'ON DISABLED' grandpa message not implemented");
-//                        return;
-//                    }
-//                    case PAUSE -> {
-//                        log.log(Level.SEVERE, "'PAUSE' grandpa message not implemented");
-//                        return;
-//                    }
-//                    case RESUME -> {
-//                        log.log(Level.SEVERE, "'RESUME' grandpa message not implemented");
-//                        return;
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public void handleAuthorityChanges(HeaderDigest[] headerDigests, BigInteger blockNumber) {
+        // Update authority set and set id
+        AuthoritySetChange authorityChanges;
+        for (HeaderDigest digest : headerDigests) {
+            if (digest.getId() == ConsensusEngine.GRANDPA) {
+                ScaleCodecReader reader = new ScaleCodecReader(digest.getMessage());
+                GrandpaDigestMessageType type = GrandpaDigestMessageType.fromId(reader.readByte());
+
+                if (type == null) {
+                    log.log(Level.SEVERE, "Could not get grandpa message type");
+                    throw new IllegalStateException("Unknown grandpa message type");
+                }
+
+                switch (type) {
+                    case SCHEDULED_CHANGE -> {
+                        ScheduledChangeReader authorityChangesReader = new ScheduledChangeReader();
+                        authorityChanges = authorityChangesReader.read(reader);
+                        scheduledAuthorityChanges
+                                .add(new Pair<>(blockNumber.add(authorityChanges.getDelay()),
+                                        authorityChanges.getAuthorities()));
+                        return;
+                    }
+                    case FORCED_CHANGE -> {
+                        ForcedChangeReader authorityForcedChangesReader = new ForcedChangeReader();
+                        authorityChanges = authorityForcedChangesReader.read(reader);
+                        scheduledAuthorityChanges
+                                .add(new Pair<>(blockNumber.add(authorityChanges.getDelay()),
+                                        authorityChanges.getAuthorities()));
+                        return;
+                    }
+                    case ON_DISABLED -> {
+                        log.log(Level.SEVERE, "'ON DISABLED' grandpa message not implemented");
+                        return;
+                    }
+                    case PAUSE -> {
+                        log.log(Level.SEVERE, "'PAUSE' grandpa message not implemented");
+                        return;
+                    }
+                    case RESUME -> {
+                        log.log(Level.SEVERE, "'RESUME' grandpa message not implemented");
+                        return;
+                    }
+                }
+            }
+        }
+    }
 
 }

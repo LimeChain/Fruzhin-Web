@@ -38,7 +38,8 @@ public class WarpSyncMachine {
     private final SyncState syncState;
     private final List<Runnable> onFinishCallbacks;
 
-    public WarpSyncMachine(Network network, ChainService chainService, SyncState syncState, WarpSyncState warpSyncState) {
+    public WarpSyncMachine(Network network, ChainService chainService, SyncState syncState,
+                           WarpSyncState warpSyncState) {
         this.networkService = network;
         this.chainService = chainService;
         this.syncState = syncState;
@@ -54,7 +55,6 @@ public class WarpSyncMachine {
     }
 
     public void handleState() {
-        System.out.println("Warp sync action" + warpSyncAction.getClass().getSimpleName());
         warpSyncAction.handle(this);
     }
 
@@ -78,12 +78,12 @@ public class WarpSyncMachine {
         this.warpSyncAction = new RequestFragmentsAction(initStateHash);
 
 //        new Thread(() -> {
-//            while (this.warpSyncAction.getClass() != FinishedAction.class) {
-                this.handleState();
-                this.nextState();
-//            }
-//
-//            finishWarpSync();
+        while (this.warpSyncAction.getClass() != FinishedAction.class) {
+            this.handleState();
+            this.nextState();
+        }
+
+        finishWarpSync();
 //        }).start();
     }
 
@@ -96,7 +96,7 @@ public class WarpSyncMachine {
     private void finishWarpSync() {
         this.warpState.setWarpSyncFinished(true);
 //        this.networkService.handshakeBootNodes();
-//        this.syncState.persistState();
+        this.syncState.persistState();
         log.info("Warp sync finished.");
         this.onFinishCallbacks.forEach(Runnable::run);
     }

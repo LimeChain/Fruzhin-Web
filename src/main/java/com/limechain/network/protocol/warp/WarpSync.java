@@ -20,25 +20,15 @@ public class WarpSync extends StrictProtocolBinding {
 
     private String protocolId;
 
-    public WarpSync(String protocolId, WarpSyncProtocol protocol) {
-        super(protocolId/*, protocol*/);
+    public WarpSync(String protocolId) {
+        super(protocolId);
         this.protocolId = protocolId;
     }
 
-    public WarpSyncResponse warpSyncRequest(/*PeerId peer,*/ String blockHash) {
-//        try {
-//        Stream stream = dialPeer(/*peer*/);
+    public WarpSyncResponse warpSyncRequest(String blockHash) {
         WarpSyncProtocol.Sender sender = new WarpSyncProtocol.Sender();
-        System.out.println("Block hash: " + blockHash);
         WarpSyncResponse resp = sender.warpSyncRequest(blockHash, protocolId);
-        log.log(Level.INFO, "Received warp sync response with " + resp/*.getFragments().length*/ + " fragments");
+        log.log(Level.INFO, "Received warp sync response with " + resp.getFragments().length + " fragments");
         return resp;
-//        } catch (ExecutionException | TimeoutException | IllegalStateException e) {
-//            log.log(Level.SEVERE, "Error while sending remote call request: ", e);
-//            throw new ExecutionFailedException(e);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            throw new ThreadInterruptedException(e);
-//        }
     }
 }

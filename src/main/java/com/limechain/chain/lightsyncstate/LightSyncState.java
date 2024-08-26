@@ -13,15 +13,16 @@ import java.util.Arrays;
 import java.util.Map;
 
 @Getter
+@ToString
 public class LightSyncState {
     private BlockHeader finalizedBlockHeader;
     private EpochChanges epochChanges;
     private AuthoritySet grandpaAuthoritySet;
 
-    public static LightSyncState decode(Map<String, String> lightSyncState) {
-        String header = lightSyncState.get("finalizedBlockHeader");
-        String epochChanges = lightSyncState.get("babeEpochChanges");
-        String grandpaAuthoritySet = lightSyncState.get("grandpaAuthoritySet");
+    public static LightSyncState decode(Map<String, String> lightSyncStateMap) {
+        String header = lightSyncStateMap.get("finalizedBlockHeader");
+        String epochChanges = lightSyncStateMap.get("babeEpochChanges");
+        String grandpaAuthoritySet = lightSyncStateMap.get("grandpaAuthoritySet");
 
         if (header == null) {
             throw new IllegalStateException("finalizedBlockHeader is null");
@@ -34,18 +35,19 @@ public class LightSyncState {
         }
 
 
-        var state = new LightSyncState();
+        LightSyncState lightSyncState = new LightSyncState();
         byte[] bytes = StringUtils.hexToBytes(header);
-        state.finalizedBlockHeader = new BlockHeaderReader()
+        lightSyncState.finalizedBlockHeader = new BlockHeaderReader()
                 .read(new ScaleCodecReader(bytes));
 
         byte[] bytes1 = StringUtils.hexToBytes(epochChanges);
-        state.epochChanges = new EpochChangesReader()
+        lightSyncState.epochChanges = new EpochChangesReader()
                 .read(new ScaleCodecReader(bytes1));
 
-        state.grandpaAuthoritySet = new AuthoritySetReader()
+        lightSyncState.grandpaAuthoritySet = new AuthoritySetReader()
                 .read(new ScaleCodecReader(StringUtils.hexToBytes(grandpaAuthoritySet)));
 
-        return state;
+        System.out.println(lightSyncState);
+        return lightSyncState;
     }
 }
