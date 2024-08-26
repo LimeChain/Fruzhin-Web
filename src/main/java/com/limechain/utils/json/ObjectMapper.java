@@ -67,18 +67,18 @@ public class ObjectMapper {
         if (type.isInstance(value)) {
             return (T) value;
         } else if (type == Integer.class || type == int.class) {
-            return handleWholeNumber(value, (long) Integer.MIN_VALUE, (long) Integer.MIN_VALUE);
+            return handleWholeNumber(value, (long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE);
         } else if (type == Long.class || type == long.class) {
             return handleWholeNumber(value, Long.MIN_VALUE, Long.MAX_VALUE);
         } else if (type == Double.class || type == double.class) {
-            BigDecimal bigDecimalValue = new BigDecimal((String) value);
+            BigDecimal bigDecimalValue = new BigDecimal(value.toString());
             double doubleValue = bigDecimalValue.doubleValue();
             if (doubleValue == Double.POSITIVE_INFINITY || doubleValue == Double.NEGATIVE_INFINITY) {
                 throw new ArithmeticException("Value out of range for Double: " + value);
             }
             return (T) Double.valueOf(doubleValue);
         } else if (type == BigInteger.class) {
-            return (T) new BigInteger((String) value);
+            return (T) new BigInteger(value.toString());
         } else if (type == Boolean.class || type == boolean.class) {
             return (T) value;
         } else if (type == String.class) {
@@ -91,6 +91,8 @@ public class ObjectMapper {
             }
         } else if (type.isArray()) {
             return (T) convertArray(type.getComponentType(), (List<?>) value);
+        } else if (Map.class.isAssignableFrom(value.getClass())) {
+            return mapToClass(JsonUtil.stringify(value), type);
         }
 
         throw new RuntimeException("Unsupported field type: " + type);
@@ -98,10 +100,10 @@ public class ObjectMapper {
 
     @SuppressWarnings("unchecked")
     private <T> T handleWholeNumber(Object value, Long min, Long max) {
-        BigInteger bigIntValue = new BigInteger((String) value);
+        BigInteger bigIntValue = new BigInteger(value.toString());
         if (bigIntValue.compareTo(BigInteger.valueOf(min)) < 0 ||
             bigIntValue.compareTo(BigInteger.valueOf(max)) > 0) {
-            throw new ArithmeticException("Value out of range number type: " + value);
+            throw new ArithmeticException("Value out of range for number type: " + value);
         }
         return (T) Integer.valueOf(bigIntValue.intValue());
     }
