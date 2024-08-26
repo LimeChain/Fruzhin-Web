@@ -54,25 +54,21 @@ public class WarpSyncProtocol /*extends ProtocolHandler<WarpSyncController>*/ {
             System.out.println("Request: " + req.getBlockHash());
             final var lock = new Object();
 
-            JSPromise<JSArray<Byte>> objectJSPromise = sendRequest(StringUtils.toHex(req.getBlockHash().getBytes()), protocolId);
+            JSPromise<String> objectJSPromise =
+                    sendRequest(StringUtils.toHex(req.getBlockHash().getBytes()), protocolId);
 
             objectJSPromise.then((ttt) -> {
-                System.out.println(ttt);
-                System.out.println(ttt.get(0));
-                System.out.println(ttt.get(ttt.getLength() - 1));
-                byte[] bytes = new byte[ttt.getLength()];
-                for (int i = 0; i < ttt.getLength(); i++) {
-                    //bytes[i] = (byte) ((int) ttt.get(i)); //fails here
-                }
-//                byte[] bytes = StringUtils.fromHex(ttt);
-                System.out.println("Received response: " + "  " + bytes);
+                System.out.println("Received response: " + ttt);
+                System.out.println("Received response len: " + ttt.length());
+                byte[] bytes = StringUtils.fromHex(ttt);
+                System.out.println("Received response: " + bytes);
                 System.out.println("Received response len: " + bytes.length);
 
-                                synchronized (lock) {
+                synchronized (lock) {
 //                    System.out.println("Received response: " + bytes.length + "  " + bytes);
                     ScaleCodecReader scaleCodecReader = new ScaleCodecReader(bytes);
                     WarpSyncResponse responseaa = new WarpSyncResponseScaleReader().read(scaleCodecReader);
-                System.out.println(responseaa);
+                    System.out.println(responseaa);
 //                    response.set(result);
                     lock.notify();
                 }
@@ -95,11 +91,13 @@ public class WarpSyncProtocol /*extends ProtocolHandler<WarpSyncController>*/ {
         }
 
         @JSBody(params = {"blockHash", "protocolId"}, script = "return (async () => {" +
-                                                               "let peer = libp.getConnections()[0].remotePeer;" +
-                                                               "let stream = await ItPbStream.pbStream(await libp.dialProtocol(peer, protocolId));" +
-                                                               "stream.writeLP(new Uint8Array([...blockHash.matchAll(/../g)].map(m => parseInt(m[0], 16))));" +
-                                                               "return Array.from((await stream.readLP()).subarray());})()")
-        private static native JSPromise<JSArray<Byte>> sendRequest(String blockHash, String protocolId);
+                                                               "    let peer = libp.getConnections()[0].remotePeer;" +
+                                                               "    let stream = await ItPbStream.pbStream(await libp.dialProtocol(peer, protocolId));" +
+                                                               "    stream.writeLP(new Uint8Array([...blockHash.matchAll(/../g)].map(m => parseInt(m[0], 16))));" +
+                                                               "    let bytes = (await stream.readLP()).subarray();" +
+                                                               "    return [...bytes].map(n => n.toString(16)).join('');" +
+                                                               "})()")
+        private static native JSPromise<String> sendRequest(String blockHash, String protocolId);
 
     }
 }
