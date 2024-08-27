@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class CommonConfig {
 
-    private static Map<Class<?>, Object> beans = new HashMap<>();
+    private static final Map<Class<?>, Object> beans = new HashMap<>();
 
     public static void start() {
         getBean(SystemInfo.class);
@@ -95,5 +95,4 @@ public class CommonConfig {
                                                    WarpSyncState warpSyncState) {
         return new WarpSyncMachine(network, chainService, syncState, warpSyncState);
     }
-
 }
