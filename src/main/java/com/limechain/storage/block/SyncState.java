@@ -24,6 +24,7 @@ public class SyncState {
     private final BigInteger startingBlock;
     private final Hash256 genesisBlockHash;
     private Hash256 lastFinalizedBlockHash;
+    private Hash256 stateRoot;
     @Setter
     private Authority[] authoritySet;
     private BigInteger latestRound;
@@ -41,6 +42,8 @@ public class SyncState {
             DBConstants.LAST_FINALIZED_BLOCK_NUMBER, BigInteger.class).orElse(BigInteger.ZERO);
         this.lastFinalizedBlockHash = new Hash256(LocalStorage.find(
             DBConstants.LAST_FINALIZED_BLOCK_HASH, byte[].class).orElse(genesisBlockHash.getBytes()));
+        byte[] stateRootBytes = LocalStorage.find(DBConstants.STATE_ROOT, byte[].class).orElse(null);
+        this.stateRoot = stateRootBytes != null ? new Hash256(stateRootBytes) : null;
         this.authoritySet = LocalStorage.find(DBConstants.AUTHORITY_SET, Authority[].class).orElse(new Authority[0]);
         this.latestRound = LocalStorage.find(DBConstants.LATEST_ROUND, BigInteger.class).orElse(BigInteger.ONE);
         this.setId = LocalStorage.find(DBConstants.SET_ID, BigInteger.class).orElse(BigInteger.ZERO);
@@ -52,17 +55,21 @@ public class SyncState {
         LocalStorage.save(DBConstants.AUTHORITY_SET, authoritySet);
         LocalStorage.save(DBConstants.LATEST_ROUND, latestRound);
         LocalStorage.save(DBConstants.SET_ID, setId);
+        LocalStorage.save(DBConstants.STATE_ROOT, stateRoot.getBytes());
     }
 
     public void finalizeHeader(BlockHeader header) {
         this.lastFinalizedBlockNumber = header.getBlockNumber();
         this.lastFinalizedBlockHash = header.getHash();
+        this.stateRoot = header.getStateRoot();
     }
 
     public void finalizedCommitMessage(CommitMessage commitMessage) {
         try {
             this.lastFinalizedBlockHash = commitMessage.getVote().getBlockHash();
             this.lastFinalizedBlockNumber = commitMessage.getVote().getBlockNumber();
+            this.setId = commitMessage.getSetId();
+            this.latestRound = commitMessage.getRoundNumber();
         } catch (HeaderNotFoundException ignored) {
             log.fine("Received commit message for a block that is not in the block store");
         }

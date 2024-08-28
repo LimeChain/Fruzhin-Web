@@ -3,7 +3,6 @@ package com.limechain.sync;
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.network.protocol.warp.dto.Precommit;
 import com.limechain.polkaj.Hash256;
-import com.limechain.polkaj.Hash512;
 import com.limechain.rpc.server.AppBean;
 import com.limechain.storage.block.SyncState;
 import com.limechain.utils.LittleEndianUtils;
@@ -18,6 +17,14 @@ import org.teavm.jso.core.JSPromise;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,9 +67,11 @@ public class JustificationVerifier {
 
             byte[] data = getDataToVerify(precommit, authoritiesSetId, round);
 
-            boolean isValid =
-                    verifySignature(precommit.getAuthorityPublicKey().toString(), precommit.getSignature().toString(),
-                            data);
+            boolean isValid = verifySignature(
+                    StringUtils.toHex(precommit.getAuthorityPublicKey().getBytes()),
+                    StringUtils.toHex(precommit.getSignature().getBytes()),
+                    StringUtils.toHex(data));
+
             if (!isValid) {
                 log.log(Level.WARNING, "Failed to verify signature");
                 return false;
@@ -75,6 +84,32 @@ public class JustificationVerifier {
         // TODO: there's also a "ghost" thing?
 
         return true;
+    }
+
+    private static boolean verifySignature(String publicKeyHex, String signatureHex,
+                                           String messageHex) {
+        JSPromise<JSBoolean> verifyAsync = verifyAsync(publicKeyHex, signatureHex, messageHex);
+        Object lock = new Object();
+        AtomicBoolean valid = new AtomicBoolean(false);
+
+        verifyAsync.then((isValid) -> {
+            synchronized (lock) {
+                valid.set(isValid.booleanValue());
+                lock.notify();
+            }
+            return null;
+        });
+
+        boolean isValid;
+        synchronized (lock) {
+            try {
+                lock.wait();
+                isValid = valid.get();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return isValid;
     }
 
     private static byte[] getDataToVerify(Precommit precommit, BigInteger authoritiesSetId, BigInteger round) {
@@ -106,53 +141,8 @@ public class JustificationVerifier {
         return data;
     }
 
-    public static boolean verifySignature(String publicKeyHex, String signatureHex, byte[] data) {
-        String message = StringUtils.toHex(data);
-        AtomicBoolean verifier = new AtomicBoolean(false);
-        Object lock = new Object();
-
-        verifySignature(publicKeyHex, signatureHex, message).then(isValid -> {
-            synchronized (lock) {
-                verifier.set(isValid.booleanValue());
-                lock.notify();
-            }
-            return null;
-        });
-
-        synchronized (lock) {
-            try {
-                lock.wait();
-
-                boolean result = verifier.get();
-                if (!result) {
-                    log.log(Level.WARNING, "Invalid signature");
-                }
-                return result;
-            } catch (InterruptedException e) {
-                log.log(Level.WARNING, "Interrupted while waiting for signature verification");
-                return false;
-            }
-        }
-    }
-
-    @JSBody(params = {"publicKeyHex", "signatureHex", "messageHex"},
-            script = "return (async () => {" +
-                     "  const publicKeyBytes = new Uint8Array([...publicKeyHex.matchAll(/../g)].map(m => parseInt(m[0], 16)));" +
-                     "  const signatureBytes = new Uint8Array([...signatureHex.matchAll(/../g)].map(m => parseInt(m[0], 16)));" +
-                     "  const publicKey = await crypto.subtle.importKey(" +
-                     "    'raw'," + "    publicKeyBytes," +
-                     "    {" + "      name: 'NODE-ED25519'," +
-                     "      namedCurve: 'ed25519'" + "    }," +
-                     "    true," + "    ['verify']" + "  );" +
-                     "  const messageBytes = new Uint8Array([...messageHex.matchAll(/../g)].map(m => parseInt(m[0], 16)));;" +
-                     "  const isValid = await crypto.subtle.verify(" +
-                     "    {" + "      name: 'NODE-ED25519'" +
-                     "    }," + "    publicKey," +
-                     "    signatureBytes," +
-                     "    messageBytes" + "  );" +
-                     "  return isValid;" +
-
-                     "})()")
-    public static native JSPromise<JSBoolean> verifySignature(String publicKeyHex, String signatureHex,
-                                                              String messageHex);
+    @JSBody(params = {"publicKeyHex", "signatureHex",
+            "messageHex"}, script = "return verifyAsync(signatureHex, messageHex, publicKeyHex);")
+    public static native JSPromise<JSBoolean> verifyAsync(String publicKeyHex, String signatureHex,
+                                                          String messageHex);
 }

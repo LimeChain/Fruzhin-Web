@@ -63,17 +63,19 @@ public class WarpSyncMachine {
     }
 
     public void start() {
-        if (this.chainService.getChainSpec().getLightSyncState() != null) {
-            LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
-            if (this.syncState.getLastFinalizedBlockNumber()
-                        .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
-                this.syncState.setLightSyncState(initState);
-            }
+        LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
+
+        if (this.syncState.getLastFinalizedBlockNumber()
+                    .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
+            this.syncState.setLightSyncState(initState);
         }
+        System.out.println(this.syncState.getLastFinalizedBlockHash());
+        System.out.println(this.syncState.getLastFinalizedBlockNumber());
+
         final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
 
         // Always start with requesting fragments
-        log.log(Level.INFO, "Requesting fragments... " + initStateHash.toString());
+        log.log(Level.INFO, "Requesting fragments... " + initStateHash);
         this.networkService.updateCurrentSelectedPeerWithNextBootnode();
         this.warpSyncAction = new RequestFragmentsAction(initStateHash);
 

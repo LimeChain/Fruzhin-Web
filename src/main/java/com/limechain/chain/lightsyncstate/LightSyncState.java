@@ -47,7 +47,6 @@ public class LightSyncState {
         lightSyncState.grandpaAuthoritySet = new AuthoritySetReader()
                 .read(new ScaleCodecReader(StringUtils.hexToBytes(grandpaAuthoritySet)));
 
-        System.out.println(lightSyncState);
         return lightSyncState;
     }
 }

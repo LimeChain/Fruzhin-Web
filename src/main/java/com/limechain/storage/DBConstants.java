@@ -21,6 +21,7 @@ public class DBConstants {
     public static final String AUTHORITY_SET = "ss::authoritySet";
     public static final String LATEST_ROUND = "ss::latestRound";
     public static final String SET_ID = "ss::setId";
+    public static final String STATE_ROOT = "ss::stateRoot";
 
     //</editor-fold>
 }
