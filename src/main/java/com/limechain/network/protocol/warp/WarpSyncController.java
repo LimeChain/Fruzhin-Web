@@ -3,14 +3,12 @@ package com.limechain.network.protocol.warp;
 import com.limechain.network.protocol.warp.dto.WarpSyncRequest;
 import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
 
-import java.util.concurrent.CompletableFuture;
-
 public interface WarpSyncController {
-    CompletableFuture<WarpSyncResponse> send(WarpSyncRequest req);
+    WarpSyncResponse send(WarpSyncRequest req, String protocolId);
 
-    default CompletableFuture<WarpSyncResponse> warpSyncRequest(String blockHash) {
+    default WarpSyncResponse warpSyncRequest(String blockHash, String protocolId) {
         var request = new WarpSyncRequest(blockHash);
 
-        return send(request);
+        return send(request, protocolId);
     }
 }

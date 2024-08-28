@@ -1,22 +1,15 @@
 package com.limechain.utils;
 
+import com.limechain.polkaj.Hash256;
 import lombok.experimental.UtilityClass;
+import org.teavm.jso.JSBody;
+import org.teavm.jso.core.JSString;
 
 @UtilityClass
 public class HashUtils {
-//    public static final int HASH256_HASH_LENGTH = Hash256.SIZE_BYTES * Byte.SIZE;
-//
-//    /**
-//     * Conducts a 256-bit Blake2b hash.
-//     * @param input the data to be hashed.
-//     * @return byte array containing the 256-bit hash result.
-//     */
-//    public static byte[] hashWithBlake2b(byte[] input) {
-//        Blake2bDigest digest = new Blake2bDigest(HASH256_HASH_LENGTH);
-//        digest.reset();
-//        digest.update(input, 0, input.length);
-//        byte[] hash = new byte[digest.getDigestSize()];
-//        digest.doFinal(hash, 0);
-//        return hash;
-//    }
+
+    @JSBody(params = {"inputHex"}, script = "{" +
+                                            "let bytes = new Uint8Array([...inputHex.matchAll(/../g)].map(m => parseInt(m[0], 16)));" +
+                                            "return Blake2b.hash(bytes,undefined,32);" + "}")
+    public static native JSString hashWithBlake2b(String inputHex);
 }
