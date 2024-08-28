@@ -27,6 +27,7 @@ public class SyncState {
     @Setter
     private Authority[] authoritySet;
     private BigInteger latestRound;
+    @Setter
     private BigInteger setId;
 
     public SyncState() {
@@ -87,9 +88,5 @@ public class SyncState {
         this.setId = initState.getGrandpaAuthoritySet().getSetId();
         setAuthoritySet(initState.getGrandpaAuthoritySet().getCurrentAuthorities());
         finalizeHeader(initState.getFinalizedBlockHeader());
-    }
-
-    public String getStateRoot() {
-        return null;
     }
 }

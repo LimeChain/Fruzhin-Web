@@ -1,12 +1,9 @@
 package com.limechain.config;
 
 import com.limechain.chain.Chain;
-import com.limechain.storage.block.SyncState;
 import com.limechain.utils.DivLogger;
 import lombok.Getter;
 
-import java.math.BigInteger;
-import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -14,20 +11,18 @@ import java.util.logging.Level;
  */
 @Getter
 public class SystemInfo {
-//    private final String role;
+    //    private final String role;
     private final Chain chain;
-//    private final String hostIdentity;
+    //    private final String hostIdentity;
     private String hostName = "Fruzhin";
     private String hostVersion = "0.0.1";
-    private final BigInteger highestBlock;
 
     private static final DivLogger log = new DivLogger();
 
-    public SystemInfo(HostConfig hostConfig, SyncState syncState) {
+    public SystemInfo(HostConfig hostConfig) {
 //        this.role = network.getNodeRole().name();
         this.chain = hostConfig.getChain();
 //        this.hostIdentity = network.getHost().getPeerId().toString();
-        this.highestBlock = syncState.getLastFinalizedBlockNumber();
         logSystemInfo();
     }
 
@@ -48,6 +43,5 @@ public class SystemInfo {
 //        log.log(Level.INFO, authEmoji + "Role: " + role);
 //        log.log(Level.INFO, "Local node identity is: " + hostIdentity);
         log.log(Level.INFO, "Operating System: " + System.getProperty("os.name"));
-        log.log(Level.INFO, "Highest known block at #" + highestBlock);
     }
 }

@@ -9,11 +9,12 @@ import com.limechain.polkaj.Hash256;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.warpsync.action.FinishedAction;
 import com.limechain.sync.warpsync.action.RequestFragmentsAction;
+import com.limechain.sync.warpsync.action.RpcFallbackAction;
 import com.limechain.sync.warpsync.action.WarpSyncAction;
+import com.limechain.tuple.Pair;
+import com.limechain.utils.DivLogger;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.java.Log;
-import com.limechain.tuple.Pair;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -23,10 +24,11 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.logging.Level;
 
-@Log
 @Getter
 @Setter
 public class WarpSyncMachine {
+
+    private static final DivLogger log = new DivLogger();
 
     private final PriorityQueue<Pair<BigInteger, Authority[]>> scheduledAuthorityChanges;
     private final ChainInformation chainInformation;
@@ -62,22 +64,27 @@ public class WarpSyncMachine {
         return this.warpSyncAction.getClass() != FinishedAction.class;
     }
 
-    public void start() {
-        LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
+    public void start(boolean useRpc) {
+        if (!useRpc) {
+            LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
 
-        if (this.syncState.getLastFinalizedBlockNumber()
-                    .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
-            this.syncState.setLightSyncState(initState);
+            if (this.syncState.getLastFinalizedBlockNumber()
+                .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
+                this.syncState.setLightSyncState(initState);
+            }
+            System.out.println(this.syncState.getLastFinalizedBlockHash());
+            System.out.println(this.syncState.getLastFinalizedBlockNumber());
+
+            final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
+            // Always start with requesting fragments
+            System.out.println("Requesting fragments... " + initStateHash);
+            this.networkService.updateCurrentSelectedPeerWithNextBootnode();
+            this.warpSyncAction = new RequestFragmentsAction(initStateHash);
+        } else {
+            System.out.println("Warping via RPC... ");
+            this.networkService.updateCurrentSelectedPeerWithNextBootnode();
+            this.warpSyncAction = new RpcFallbackAction();
         }
-        System.out.println(this.syncState.getLastFinalizedBlockHash());
-        System.out.println(this.syncState.getLastFinalizedBlockNumber());
-
-        final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
-
-        // Always start with requesting fragments
-        log.log(Level.INFO, "Requesting fragments... " + initStateHash);
-        this.networkService.updateCurrentSelectedPeerWithNextBootnode();
-        this.warpSyncAction = new RequestFragmentsAction(initStateHash);
 
 //        new Thread(() -> {
         while (this.warpSyncAction.getClass() != FinishedAction.class) {
@@ -90,16 +97,17 @@ public class WarpSyncMachine {
     }
 
     public void stop() {
-        log.info("Stopping warp sync machine");
+        System.out.println("Stopping warp sync machine");
         this.warpSyncAction = null;
-        log.info("Warp sync machine stopped.");
+        System.out.println("Warp sync machine stopped.");
     }
 
     private void finishWarpSync() {
         this.warpState.setWarpSyncFinished(true);
 //        this.networkService.handshakeBootNodes();
         this.syncState.persistState();
-        log.info("Warp sync finished.");
+        System.out.println("Warp sync finished.");
+        log.log(Level.INFO, "Highest known block at #" + syncState.getLastFinalizedBlockNumber());
         this.onFinishCallbacks.forEach(Runnable::run);
     }
 

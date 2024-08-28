@@ -5,6 +5,7 @@ import com.limechain.client.LightClient;
 import com.limechain.rpc.Function;
 import com.limechain.rpc.RpcClient;
 import com.limechain.rpc.server.RpcApp;
+import com.limechain.storage.LocalStorage;
 import com.limechain.utils.DivLogger;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.core.JSString;
@@ -17,6 +18,7 @@ public class Main {
 
     public static void main(String[] args) {
         log.log("Starting LimeChain node...");
+        LocalStorage.clear();
         RpcApp rpcApp = new RpcApp();
         rpcApp.start();
 

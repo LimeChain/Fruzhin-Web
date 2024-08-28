@@ -42,7 +42,7 @@ public class CommonConfig {
                     beans.put(beanClass, syncState);
                     return syncState;
                 case "SystemInfo":
-                    SystemInfo systemInfo = systemInfo((HostConfig) getBean(HostConfig.class), (SyncState) getBean(SyncState.class));
+                    SystemInfo systemInfo = systemInfo((HostConfig) getBean(HostConfig.class));
                     beans.put(beanClass, systemInfo);
                     return systemInfo;
                 case "Network":
@@ -79,8 +79,8 @@ public class CommonConfig {
         return new SyncState();
     }
 
-    private static SystemInfo systemInfo(HostConfig hostConfig, SyncState syncState) {
-        return new SystemInfo(hostConfig, syncState);
+    private static SystemInfo systemInfo(HostConfig hostConfig) {
+        return new SystemInfo(hostConfig);
     }
 
     private static Network network(ChainService chainService, HostConfig hostConfig) {
