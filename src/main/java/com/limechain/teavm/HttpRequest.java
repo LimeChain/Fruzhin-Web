@@ -17,7 +17,7 @@ public class HttpRequest {
     public static native String asyncHttpRequest(String method, String url, String body);
 
     private static void asyncHttpRequest(String method, String url, String body, AsyncCallback<String> callback) {
-        createAsyncHttpRequest(method, url, body, (error, response) -> {
+        createHttpRequest(method, url, body, (error, response) -> {
             if (error != null) {
                 log.log(Level.WARNING, error.getMessage());
             } else {
@@ -27,7 +27,10 @@ public class HttpRequest {
     }
 
     @JSBody(params = {"method", "url", "body", "callback"}, script = "return asyncHttpRequest(method, url, body, callback);")
-    private static native void createAsyncHttpRequest(String method, String url, String body, HttpRequestCallback callback);
+    private static native void createHttpRequest(String method, String url, String body, HttpRequestCallback callback);
+
+    @JSBody(params = {"method", "url", "body"}, script = "return httpRequestSync(method, url, body);")
+    public static native String createHttpRequest(String method, String url, String body);
 
     @JSFunctor
     private interface HttpRequestCallback extends JSObject {
