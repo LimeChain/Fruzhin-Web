@@ -15,7 +15,6 @@ public abstract class StrictProtocolBinding {
 
     public Stream dialPeer(/*PeerId peer*/) {
         Object peer1 = getPeer();
-        System.out.println("Peer: " + peer1);
         JSPromise<Object> dial = dial(peer1, protocolId);
         final var lock = new Object();
         AtomicReference<Stream> stream = new AtomicReference<>();
@@ -35,14 +34,9 @@ public abstract class StrictProtocolBinding {
                 throw new RuntimeException(e);
             }
         }
-        Stream atomicStream = stream.get();
 
-        System.out.println("Stream: " + toJson(atomicStream));
-        return atomicStream;
+        return stream.get();
     }
-
-    @JSBody(params = {"object"}, script = "return JSON.stringify(object);")
-    private static native String toJson(Object object);
 
     @JSBody(params = {"peerId", "protocolId"}, script = "return (async () => ItPbStream.pbStream(await libp.dialProtocol(peerId, protocolId)))()")
     private static native JSPromise<Object> dial(Object peerId, String protocolId);
