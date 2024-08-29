@@ -12,6 +12,12 @@ import lombok.ToString;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * Represents the light synchronization state in the genesis block.
+ *
+ * <p>This class contains the finalized block header, epoch changes, and
+ * the GRANDPA authority set necessary for light clients to synchronize with the blockchain.</p>
+ */
 @Getter
 @ToString
 public class LightSyncState {
@@ -19,6 +25,13 @@ public class LightSyncState {
     private EpochChanges epochChanges;
     private AuthoritySet grandpaAuthoritySet;
 
+    /**
+     * Decodes LightSyncState from a map of hex-encoded strings.
+     *
+     * @param lightSyncStateMap A map with keys: "finalizedBlockHeader", "babeEpochChanges", and "grandpaAuthoritySet".
+     * @return A decoded LightSyncState instance.
+     * @throws IllegalStateException if any required data is missing.
+     */
     public static LightSyncState decode(Map<String, String> lightSyncStateMap) {
         String header = lightSyncStateMap.get("finalizedBlockHeader");
         String epochChanges = lightSyncStateMap.get("babeEpochChanges");
