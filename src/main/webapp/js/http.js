@@ -36,3 +36,13 @@ function httpRequestSync(method, url, body) {
         throw new Error('Request failed with status ' + xhr.status);
     }
 }
+
+var isRpcExported = false;
+
+function sendRpcRequest(method, params) {
+    if (isRpcExported === false) {
+        window.setTimeout(() => sendRpcRequest(method, params), 10);
+    } else {
+        console.log(rpc.sendRequest(method, params));
+    }
+}

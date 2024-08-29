@@ -28,7 +28,7 @@ public sealed class RpcClient permits BlockRpcClient {
         return JsonUtil.stringify(request);
     }
 
-    public static String sendRpcRequest(String method, String[] params) {
+    public static String sendRpcRequest(String method, Object[] params) {
         return HttpRequest.createHttpRequest(POST, LOAD_BALANCER.getNextEndpoint(),
             createRpcRequestJson(method, List.of(params)));
     }
