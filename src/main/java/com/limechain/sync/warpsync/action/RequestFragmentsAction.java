@@ -50,8 +50,8 @@ public class RequestFragmentsAction implements WarpSyncAction {
 
     @Override
     public void handle(WarpSyncMachine sync) {
-        WarpSyncResponse resp = sync.getNetworkService().makeWarpSyncRequest(blockHash.toString());
         try {
+            WarpSyncResponse resp = sync.getNetworkService().makeWarpSyncRequest(blockHash.toString());
             if (resp == null) {
                 throw new MissingObjectException("No response received.");
             }
