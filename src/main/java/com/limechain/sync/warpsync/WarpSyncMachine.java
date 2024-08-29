@@ -30,11 +30,12 @@ public class WarpSyncMachine {
 
     private static final DivLogger log = new DivLogger();
 
+    private Queue<WarpSyncFragment> fragmentsQueue;
+    private WarpSyncAction warpSyncAction;
+    private boolean isProtocolSync;
     private final PriorityQueue<Pair<BigInteger, Authority[]>> scheduledAuthorityChanges;
     private final ChainInformation chainInformation;
-    private Queue<WarpSyncFragment> fragmentsQueue;
     private final ChainService chainService;
-    private WarpSyncAction warpSyncAction;
     private final WarpSyncState warpState;
     private final Network networkService;
     private final SyncState syncState;
@@ -50,6 +51,7 @@ public class WarpSyncMachine {
         this.scheduledAuthorityChanges = new PriorityQueue<>(Comparator.comparing(Pair::getValue0));
         this.chainInformation = new ChainInformation();
         this.onFinishCallbacks = new ArrayList<>();
+        this.isProtocolSync = false;
     }
 
     public void nextState() {
@@ -64,16 +66,15 @@ public class WarpSyncMachine {
         return this.warpSyncAction.getClass() != FinishedAction.class;
     }
 
-    public void start(boolean useRpc) {
-        if (!useRpc) {
+    public void start() {
+        if (isProtocolSync) {
+            System.out.println("Warping via warp protocol... ");
             LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
 
             if (this.syncState.getLastFinalizedBlockNumber()
                 .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
                 this.syncState.setLightSyncState(initState);
             }
-            System.out.println(this.syncState.getLastFinalizedBlockHash());
-            System.out.println(this.syncState.getLastFinalizedBlockNumber());
 
             final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
             // Always start with requesting fragments
@@ -106,6 +107,7 @@ public class WarpSyncMachine {
         this.warpState.setWarpSyncFinished(true);
 //        this.networkService.handshakeBootNodes();
         this.syncState.persistState();
+        syncState.saveIsProtocolSync(isProtocolSync);
         System.out.println("Warp sync finished.");
         log.log(Level.INFO, "Highest known block at #" + syncState.getLastFinalizedBlockNumber());
         this.onFinishCallbacks.forEach(Runnable::run);

@@ -33,6 +33,7 @@ public class SyncState {
     public SyncState() {
         this.genesisBlockHash = GenesisBlockHash.POLKADOT;
 
+        clearStoredStateIfNeeded();
         loadState();
         this.startingBlock = this.lastFinalizedBlockNumber;
     }
@@ -88,5 +89,16 @@ public class SyncState {
         this.setId = initState.getGrandpaAuthoritySet().getSetId();
         setAuthoritySet(initState.getGrandpaAuthoritySet().getCurrentAuthorities());
         finalizeHeader(initState.getFinalizedBlockHeader());
+    }
+
+    public void saveIsProtocolSync(boolean isProtocolSync) {
+        LocalStorage.save(DBConstants.IS_PROTOCOL_SYNC, isProtocolSync);
+    }
+
+    private void clearStoredStateIfNeeded() {
+        boolean isProtocolSync = LocalStorage.find(DBConstants.IS_PROTOCOL_SYNC, boolean.class).orElse(false);
+        if (!isProtocolSync) {
+            LocalStorage.clear();
+        }
     }
 }

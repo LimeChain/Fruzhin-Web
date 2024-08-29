@@ -42,17 +42,15 @@ public class LightClient implements HostNode {
             this.network.updateCurrentSelectedPeer();
 
             if (this.network.getKademliaService().getSuccessfulBootNodes() > 0) {
-                System.out.println("Node successfully connected to a peer! Sync will use warp protocol!");
-                warpSyncMachine.start(false);
-                return;
+                warpSyncMachine.setProtocolSync(true);
+                break;
             } else {
                 retryCount++;
                 System.out.println("Waiting to retry peer connection...");
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             }
         }
 
-        System.out.println("Node failed to connect to peer! Sync will use RPC calls!!");
-        warpSyncMachine.start(true);
+        warpSyncMachine.start();
     }
 }

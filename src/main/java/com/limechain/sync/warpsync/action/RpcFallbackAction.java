@@ -68,6 +68,7 @@ public class RpcFallbackAction implements WarpSyncAction {
             syncState.setSetId(BigInteger.valueOf(roundStateResult.getSetId()));
             syncState.resetRound();
 
+            sync.setProtocolSync(false);
         } catch (Exception e) {
             log.log(Level.WARNING, "Error while calling rpc endpoints: " + e.getMessage());
             this.error = e;
