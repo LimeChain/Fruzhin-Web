@@ -87,14 +87,14 @@ public class WarpSyncMachine {
             this.warpSyncAction = new RpcFallbackAction();
         }
 
-//        new Thread(() -> {
-        while (this.warpSyncAction.getClass() != FinishedAction.class) {
-            this.handleState();
-            this.nextState();
-        }
+        new Thread(() -> {
+            while (this.warpSyncAction.getClass() != FinishedAction.class) {
+                this.handleState();
+                this.nextState();
+            }
 
-        finishWarpSync();
-//        }).start();
+            finishWarpSync();
+        }).start();
     }
 
     public void stop() {

@@ -56,9 +56,9 @@ public class RequestFragmentsAction implements WarpSyncAction {
                 throw new MissingObjectException("No response received.");
             }
 
-            log.log(Level.INFO, "Successfully received fragments from peer");
+            log.log(Level.INFO, "Successfully received response from peer");
             if (resp.getFragments().length == 0) {
-                log.log(Level.WARNING, "No fragments received.");
+                log.log(Level.WARNING, "The response contained no fragments - the peer is up to date.");
                 return;
             }
             warpSyncState.setWarpSyncFragmentsFinished(resp.isFinished());

@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 @Log
 public class ObjectMapper {
@@ -52,7 +51,6 @@ public class ObjectMapper {
             if (failOnUnknownField) {
                 throw new IllegalStateException("Field " + fieldName + " does not exist in " + clazz.getName());
             } else {
-                log.log(Level.FINE, "Field " + fieldName + " does not exist in " + clazz.getName());
                 return null;
             }
         }
