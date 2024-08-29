@@ -69,8 +69,6 @@ public class WarpSyncMachine {
                     .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
             this.syncState.setLightSyncState(initState);
         }
-        System.out.println(this.syncState.getLastFinalizedBlockHash());
-        System.out.println(this.syncState.getLastFinalizedBlockNumber());
 
         final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
 
@@ -79,14 +77,14 @@ public class WarpSyncMachine {
         this.networkService.updateCurrentSelectedPeerWithNextBootnode();
         this.warpSyncAction = new RequestFragmentsAction(initStateHash);
 
-//        new Thread(() -> {
-        while (this.warpSyncAction.getClass() != FinishedAction.class) {
-            this.handleState();
-            this.nextState();
-        }
+        new Thread(() -> {
+            while (this.warpSyncAction.getClass() != FinishedAction.class) {
+                this.handleState();
+                this.nextState();
+            }
 
-        finishWarpSync();
-//        }).start();
+            finishWarpSync();
+        }).start();
     }
 
     public void stop() {
