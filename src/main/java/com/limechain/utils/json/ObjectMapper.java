@@ -52,7 +52,6 @@ public class ObjectMapper {
             if (failOnUnknownField) {
                 throw new IllegalStateException("Field " + fieldName + " does not exist in " + clazz.getName());
             } else {
-                log.log(Level.FINE, "Field " + fieldName + " does not exist in " + clazz.getName());
                 return null;
             }
         }
