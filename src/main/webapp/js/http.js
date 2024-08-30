@@ -40,9 +40,23 @@ function httpRequestSync(method, url, body) {
 var isRpcExported = false;
 
 function sendRpcRequest(method, params) {
-    if (isRpcExported === false) {
-        window.setTimeout(() => sendRpcRequest(method, params), 10);
-    } else {
-        console.log(rpc.sendRequest(method, params));
-    }
+    return new Promise((resolve, reject) => {
+        if (isRpcExported === false) {
+            window.setTimeout(async () => {
+                try {
+                    const result = await sendRpcRequest(method, params);
+                    resolve(result);
+                } catch (error) {
+                    reject(error);
+                }
+            }, 10);
+        } else {
+            try {
+                const result = rpc.sendRequest(method, params);
+                resolve(result);
+            } catch (error) {
+                reject(error);
+            }
+        }
+    });
 }
