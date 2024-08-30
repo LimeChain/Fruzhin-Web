@@ -13,11 +13,13 @@ import java.util.logging.Level;
 
 public class Main {
 
+    private static final String RPC_VARIABLE_NAME = "rpc";
+
     private static final DivLogger log = new DivLogger();
 
     public static void main(String[] args) {
         log.log("Starting LimeChain node...");
-        exportAPI(RpcClient::sendRpcRequest, JSString.valueOf("rpc"));
+        exportAPI(RpcClient::sendRpcRequest, JSString.valueOf(RPC_VARIABLE_NAME));
 
         RpcApp rpcApp = new RpcApp();
         rpcApp.start();
