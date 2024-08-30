@@ -5,7 +5,8 @@ import com.limechain.network.protocol.warp.dto.HeaderDigest;
 import com.limechain.network.protocol.warp.scale.reader.HeaderDigestReader;
 import com.limechain.polkaj.Hash256;
 import com.limechain.polkaj.reader.ScaleCodecReader;
-import com.limechain.rpc.BlockRpcClient;
+import com.limechain.rpc.ChainRpcClient;
+import com.limechain.rpc.GrandpaRpcClient;
 import com.limechain.rpc.dto.ChainGetHeaderResult;
 import com.limechain.rpc.dto.GrandpaRoundStateResult;
 import com.limechain.rpc.server.AppBean;
@@ -18,6 +19,11 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.logging.Level;
 
+/**
+ * A fallback state of the {@link WarpSyncMachine}. If the machine fails to start or fails during execution without
+ * the possibility to retry it reaches this action. The {@link SyncState} of the node gets populated with the latest
+ * finalized block data via the use of RPC calls to other active nodes.
+ */
 @Log
 public class RpcFallbackAction implements WarpSyncAction {
     private final SyncState syncState;
@@ -30,7 +36,7 @@ public class RpcFallbackAction implements WarpSyncAction {
     @Override
     public void next(WarpSyncMachine sync) {
         if (this.error != null) {
-            sync.setWarpSyncAction(new RequestFragmentsAction(syncState.getLastFinalizedBlockHash()));
+            sync.setWarpSyncAction(new FinishedAction());
             return;
         }
 
@@ -45,9 +51,9 @@ public class RpcFallbackAction implements WarpSyncAction {
     @Override
     public void handle(WarpSyncMachine sync) {
         try {
-            Hash256 latestFinalizedHashResult = BlockRpcClient.getLastFinalizedBlockHash();
-            ChainGetHeaderResult headerResult = BlockRpcClient.getHeader(latestFinalizedHashResult.toString());
-            GrandpaRoundStateResult roundStateResult = BlockRpcClient.getGrandpaRoundState();
+            Hash256 latestFinalizedHashResult = ChainRpcClient.getLastFinalizedBlockHash();
+            ChainGetHeaderResult headerResult = ChainRpcClient.getHeader(latestFinalizedHashResult.toString());
+            GrandpaRoundStateResult roundStateResult = GrandpaRpcClient.getGrandpaRoundState();
 
             BlockHeader latestFinalizedHeader = new BlockHeader();
             latestFinalizedHeader.setBlockNumber(new BigInteger(
