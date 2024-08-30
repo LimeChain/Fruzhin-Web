@@ -3,6 +3,7 @@ package com.limechain.network.protocol.warp.dto;
 import com.limechain.polkaj.Hash256;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.java.Log;
 
 import java.math.BigInteger;
@@ -11,6 +12,7 @@ import java.util.Arrays;
 @Setter
 @Getter
 @Log
+@ToString
 public class Justification {
     private BigInteger round;
     private Hash256 targetHash;

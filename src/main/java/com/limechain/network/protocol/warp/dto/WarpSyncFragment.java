@@ -2,6 +2,7 @@ package com.limechain.network.protocol.warp.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Each fragment represents a change in the list of Grandpa authorities, and a list of signatures of
@@ -9,6 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@ToString
 public class WarpSyncFragment {
     private BlockHeader header;
     private Justification justification;

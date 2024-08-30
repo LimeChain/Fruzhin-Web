@@ -5,7 +5,7 @@ import com.limechain.network.StrictProtocolBinding;
 /**
  * GRANDPA protocol binding
  */
-public class Grandpa extends StrictProtocolBinding<GrandpaController> {
+public class Grandpa extends StrictProtocolBinding {
     public Grandpa(String protocolId, GrandpaProtocol protocol) {
         super(protocolId/*, protocol*/);
     }

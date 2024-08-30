@@ -27,10 +27,5 @@ public class HttpRequest {
     }
 
     @JSBody(params = {"method", "url", "body", "callback"}, script = "return asyncHttpRequest(method, url, body, callback);")
-    public static native void createAsyncHttpRequest(String method, String url, String body, HttpRequestCallback callback);
-
-    @JSFunctor
-    private interface HttpRequestCallback extends JSObject {
-        void apply(JSError error, String response);
-    }
+    public static native void createAsyncHttpRequest(String method, String url, String body, TeaVMCallback callback);
 }

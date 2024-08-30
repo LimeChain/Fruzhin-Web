@@ -12,16 +12,30 @@ import lombok.ToString;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * Represents the light synchronization state in the genesis block.
+ *
+ * <p>This class contains the finalized block header, epoch changes, and
+ * the GRANDPA authority set necessary for light clients to synchronize with the blockchain.</p>
+ */
 @Getter
+@ToString
 public class LightSyncState {
     private BlockHeader finalizedBlockHeader;
     private EpochChanges epochChanges;
     private AuthoritySet grandpaAuthoritySet;
 
-    public static LightSyncState decode(Map<String, String> lightSyncState) {
-        String header = lightSyncState.get("finalizedBlockHeader");
-        String epochChanges = lightSyncState.get("babeEpochChanges");
-        String grandpaAuthoritySet = lightSyncState.get("grandpaAuthoritySet");
+    /**
+     * Decodes LightSyncState from a map of hex-encoded strings.
+     *
+     * @param lightSyncStateMap A map with keys: "finalizedBlockHeader", "babeEpochChanges", and "grandpaAuthoritySet".
+     * @return A decoded LightSyncState instance.
+     * @throws IllegalStateException if any required data is missing.
+     */
+    public static LightSyncState decode(Map<String, String> lightSyncStateMap) {
+        String header = lightSyncStateMap.get("finalizedBlockHeader");
+        String epochChanges = lightSyncStateMap.get("babeEpochChanges");
+        String grandpaAuthoritySet = lightSyncStateMap.get("grandpaAuthoritySet");
 
         if (header == null) {
             throw new IllegalStateException("finalizedBlockHeader is null");
@@ -34,18 +48,18 @@ public class LightSyncState {
         }
 
 
-        var state = new LightSyncState();
+        LightSyncState lightSyncState = new LightSyncState();
         byte[] bytes = StringUtils.hexToBytes(header);
-        state.finalizedBlockHeader = new BlockHeaderReader()
+        lightSyncState.finalizedBlockHeader = new BlockHeaderReader()
                 .read(new ScaleCodecReader(bytes));
 
         byte[] bytes1 = StringUtils.hexToBytes(epochChanges);
-        state.epochChanges = new EpochChangesReader()
+        lightSyncState.epochChanges = new EpochChangesReader()
                 .read(new ScaleCodecReader(bytes1));
 
-        state.grandpaAuthoritySet = new AuthoritySetReader()
+        lightSyncState.grandpaAuthoritySet = new AuthoritySetReader()
                 .read(new ScaleCodecReader(StringUtils.hexToBytes(grandpaAuthoritySet)));
 
-        return state;
+        return lightSyncState;
     }
 }

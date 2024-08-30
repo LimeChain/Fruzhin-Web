@@ -38,7 +38,8 @@ public class WarpSyncMachine {
     private final SyncState syncState;
     private final List<Runnable> onFinishCallbacks;
 
-    public WarpSyncMachine(Network network, ChainService chainService, SyncState syncState, WarpSyncState warpSyncState) {
+    public WarpSyncMachine(Network network, ChainService chainService, SyncState syncState,
+                           WarpSyncState warpSyncState) {
         this.networkService = network;
         this.chainService = chainService;
         this.syncState = syncState;
@@ -62,28 +63,28 @@ public class WarpSyncMachine {
     }
 
     public void start() {
-        if (this.chainService.getChainSpec().getLightSyncState() != null) {
-            LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
-            if (this.syncState.getLastFinalizedBlockNumber()
-                        .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
-                this.syncState.setLightSyncState(initState);
-            }
+        LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
+
+        if (this.syncState.getLastFinalizedBlockNumber()
+                    .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
+            this.syncState.setLightSyncState(initState);
         }
+
         final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
 
         // Always start with requesting fragments
-        log.log(Level.INFO, "Requesting fragments...");
+        log.log(Level.INFO, "Requesting fragments... " + initStateHash);
         this.networkService.updateCurrentSelectedPeerWithNextBootnode();
         this.warpSyncAction = new RequestFragmentsAction(initStateHash);
 
-//        new Thread(() -> {
-//            while (this.warpSyncAction.getClass() != FinishedAction.class) {
-//                this.handleState();
-//                this.nextState();
-//            }
-//
-//            finishWarpSync();
-//        }).start();
+        new Thread(() -> {
+            while (this.warpSyncAction.getClass() != FinishedAction.class) {
+                this.handleState();
+                this.nextState();
+            }
+
+            finishWarpSync();
+        }).start();
     }
 
     public void stop() {
@@ -95,7 +96,7 @@ public class WarpSyncMachine {
     private void finishWarpSync() {
         this.warpState.setWarpSyncFinished(true);
 //        this.networkService.handshakeBootNodes();
-//        this.syncState.persistState();
+        this.syncState.persistState();
         log.info("Warp sync finished.");
         this.onFinishCallbacks.forEach(Runnable::run);
     }

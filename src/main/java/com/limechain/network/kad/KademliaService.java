@@ -2,6 +2,7 @@ package com.limechain.network.kad;
 
 import com.limechain.network.kad.dto.Host;
 import com.limechain.network.kad.dto.PeerId;
+import com.limechain.network.protocol.NetworkService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
@@ -9,6 +10,7 @@ import org.teavm.interop.Async;
 import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.JSBody;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
@@ -19,30 +21,12 @@ import java.util.logging.Level;
  */
 @Getter
 @Log
-public class KademliaService /*extends NetworkService<Kademlia>*/ {
+public class KademliaService extends NetworkService {
     public static final int REPLICATION = 20;
-    private static final Random RANDOM = new Random();
 
     @Setter
     private Host host;
-    //    private List<PeerId> bootNodePeerIds;
     private int successfulBootNodes;
-
-
-    public void addReservedPeer(String multiaddr) throws ExecutionException, InterruptedException {
-//        final Multiaddr addrWithPeer = Multiaddr.fromString(multiaddr);
-//
-//        CompletableFuture<Stream> peerStream =
-//                protocol.dial(host, addrWithPeer.getPeerId(), addrWithPeer).getStream();
-//
-//        Stream stream = peerStream.get();
-//        if (stream == null) {
-//            log.log(Level.WARNING, "Failed to connect to reserved peer");
-//        } else {
-//            ConnectionManager.getInstance().addNewPeer(addrWithPeer.getPeerId());
-//            log.log(Level.INFO, "Successfully connected to reserved peer");
-//        }
-    }
 
     /**
      * Connects to boot nodes to the Kademlia dht
@@ -76,49 +60,35 @@ public class KademliaService /*extends NetworkService<Kademlia>*/ {
         return successfulBootNodes;
     }
 
+    public void updateSuccessfulBootNodes() {
+        successfulBootNodes = getPeerStoreSize();
+    }
+
     @JSBody(params = {"bootNodes"}, script = "start(bootNodes)")
-    @Async
     public static native void startNetwork(String[] bootNodes);
 
     @JSBody(script = "return getPeerId()")
     public static native Object getPeerId();
+
     @JSBody(script = "return libp.peerId.privateKey")
     public static native byte[] getPeerPrivateKey();
+
     @JSBody(script = "return libp.peerId.publicKey")
     public static native byte[] getPeerPublicKey();
-    @JSBody(script = "return libp.peerStore.store.datastore.data.size")
-    public static native int getPeerStoreSize();
 
+    @JSBody(script = "return libp.getConnections().length")
+    public static native int getPeerStoreSize();
 
     /**
      * Populates Kademlia dht with peers closest in distance to a random id then makes connections with our node
      */
-    public void findNewPeers() {
-//        protocol.findClosestPeers(randomPeerId(), REPLICATION, host);
-//        final var peers =
-//                protocol.findClosestPeers(Multihash.deserialize(host.getPeerId().getBytes()), REPLICATION, host);
-//
-//        peers.stream().parallel().forEach(p -> {
-//            boolean isConnected = protocol.connectTo(host, p);
-//
-//            if (!isConnected) {
-//                protocol.connectTo(host, p);
-//            }
-//        });
-    }
-//
-//    private Multihash randomPeerId() {
-//        byte[] hash = new byte[32];
-//        RANDOM.nextBytes(hash);
-//        return new Multihash(Multihash.Type.sha2_256, hash);
-//    }
-//
-//    private void setBootNodePeerIds(String[] bootNodes) {
-//        ArrayList<PeerId> ids = new ArrayList<>();
-//        for (String bootNode : bootNodes) {
-//            String peerId = bootNode.substring(bootNode.lastIndexOf('/') + 1, bootNode.length());
-//            ids.add(PeerId.fromBase58(peerId));
-//        }
-//        this.bootNodePeerIds = ids;
-//    }
+    @JSBody(script = "libp.peerStore.forEach( async (p) => {" +
+                     "    for await (const foundPeer of dht.peerRouting.getClosestPeers(p.id.toBytes())){" +
+                     "        if(foundPeer.peer?.multiaddrs?.length > 0){" +
+                     "            try{libp.dial(foundPeer.peer)}finally{}" +
+                     "        }" +
+                     "    }" +
+                     "});")
+    public static native void findNewPeers();
+
 }

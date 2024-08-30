@@ -1,59 +1,66 @@
 package com.limechain.network.protocol.warp;
 
-public class WarpSyncProtocol /*extends ProtocolHandler<WarpSyncController>*/ {
-    // Sizes taken from smoldot
-    public static final int MAX_REQUEST_SIZE = 32;
-    public static final int MAX_RESPONSE_SIZE = 16 * 1024 * 1024;
+import com.limechain.network.protocol.warp.dto.WarpSyncRequest;
+import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
+import com.limechain.network.protocol.warp.scale.reader.WarpSyncResponseScaleReader;
+import com.limechain.polkaj.reader.ScaleCodecReader;
+import com.limechain.utils.StringUtils;
+import org.teavm.jso.JSBody;
+import org.teavm.jso.core.JSPromise;
+import org.teavm.jso.core.JSString;
+
+import java.util.concurrent.atomic.AtomicReference;
+
+public class WarpSyncProtocol {
 
     public WarpSyncProtocol() {
-//        super(MAX_REQUEST_SIZE, MAX_RESPONSE_SIZE);
     }
 
-    /*@Override
-    protected CompletableFuture<WarpSyncController> onStartInitiator(Stream stream) {
-        stream.pushHandler(new Leb128LengthFrameDecoder());
-        stream.pushHandler(new WarpSyncResponseDecoder());
+    static class Sender implements WarpSyncController {
 
-        stream.pushHandler(new Leb128LengthFrameEncoder());
-        stream.pushHandler(new ByteArrayEncoder());
-        WarpSyncProtocol.Sender handler = new WarpSyncProtocol.Sender(stream);
-        stream.pushHandler(handler);
-        return CompletableFuture.completedFuture(handler);
-    }*/
-
-    /*static class Sender implements ProtocolMessageHandler<WarpSyncResponse>, WarpSyncController {
-        public static final int MAX_QUEUE_SIZE = 50;
-        private final LinkedBlockingDeque<CompletableFuture<WarpSyncResponse>> queue =
-                new LinkedBlockingDeque<>(MAX_QUEUE_SIZE);
-        private final Stream stream;
-
-        public Sender(Stream stream) {
-            this.stream = stream;
+        public Sender() {
         }
 
         @Override
-        public void onMessage(Stream stream, WarpSyncResponse msg) {
-            Objects.requireNonNull(queue.poll()).complete(msg);
-            stream.closeWrite();
-        }
+        public WarpSyncResponse send(WarpSyncRequest req, String protocolId) {
+            final var lock = new Object();
 
-        @Override
-        public CompletableFuture<WarpSyncResponse> send(WarpSyncRequest req) {
-            ByteArrayOutputStream buf = new ByteArrayOutputStream();
-            try (ScaleCodecWriter writer = new ScaleCodecWriter(buf)) {
-                writer.write(new WarpSyncRequestWriter(), req);
-            } catch (IOException e) {
-                throw new ScaleEncodingException(e);
+            AtomicReference<byte[]> response = new AtomicReference<>();
+            JSPromise<JSString> objectJSPromise =
+                    sendRequest(StringUtils.toHex(req.getBlockHash().getBytes()), protocolId);
+
+            objectJSPromise.then((ttt) -> {
+                synchronized (lock) {
+                    String str = ttt.stringValue();
+                    byte[] bytes = StringUtils.fromHex(str);
+
+                    response.set(bytes);
+                    lock.notify();
+                }
+                return null;
+            });
+
+            synchronized (lock) {
+                try {
+                    lock.wait();
+                    byte[] bytes = response.get();
+                    ScaleCodecReader scaleCodecReader = new ScaleCodecReader(bytes);
+
+                    return new WarpSyncResponseScaleReader().read(scaleCodecReader);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            CompletableFuture<WarpSyncResponse> res = new CompletableFuture<>();
-            queue.add(res);
-            stream.writeAndFlush(buf.toByteArray());
-            return res;
         }
 
-        @Override
-        public void onException(Throwable cause) {
-            Objects.requireNonNull(queue.poll()).completeExceptionally(cause);
-        }
-    }*/
+        @JSBody(params = {"blockHash", "protocolId"}, script = "return (async () => {" +
+                                                               "    let peer = libp.getConnections()[0].remotePeer;" +
+                                                               "    let stream = await ItPbStream.pbStream(await libp.dialProtocol(peer, protocolId));" +
+                                                               "    stream.writeLP(new Uint8Array([...blockHash.matchAll(/../g)].map(m => parseInt(m[0], 16))));" +
+                                                               "    let bytes = (await stream.readLP()).subarray();" +
+                                                               "    return [...bytes].map(n => n.toString(16).padStart(2, '0')).join('');" +
+                                                               "})()")
+        private static native JSPromise<JSString> sendRequest(String blockHash, String protocolId);
+
+    }
 }
