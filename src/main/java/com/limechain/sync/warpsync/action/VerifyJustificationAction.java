@@ -28,7 +28,7 @@ public class VerifyJustificationAction implements WarpSyncAction {
     public void next(WarpSyncMachine sync) {
         if (this.error != null) {
             // Not sure what state we should transition to here.
-            sync.setWarpSyncAction(new FinishedAction());
+            sync.setWarpSyncAction(new RpcFallbackAction());
             return;
         }
 
@@ -53,7 +53,7 @@ public class VerifyJustificationAction implements WarpSyncAction {
             }
             boolean verified = JustificationVerifier.verify(
                     fragment.getJustification().getPrecommits(),
-                    fragment.getJustification().getRound());
+                fragment.getJustification().getRound());
             if (!verified) {
                 throw new JustificationVerificationException("Justification could not be verified.");
             }
@@ -70,11 +70,11 @@ public class VerifyJustificationAction implements WarpSyncAction {
         try {
             warpSyncState.handleAuthorityChanges(
                     fragment.getHeader().getDigest(),
-                    fragment.getJustification().getTargetBlock());
+                fragment.getJustification().getTargetBlock());
             log.log(Level.INFO, "Verified justification. Block hash is now at #"
                     + syncState.getLastFinalizedBlockNumber() + ": "
-                    + syncState.getLastFinalizedBlockHash().toString()
-                    + " with state root " + syncState.getStateRoot());
+                + syncState.getLastFinalizedBlockHash().toString()
+                + " with state root " + syncState.getStateRoot());
         } catch (Exception e) {
             this.error = e;
         }

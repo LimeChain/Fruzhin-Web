@@ -5,6 +5,7 @@ import com.limechain.constants.RpcConstants;
 import com.limechain.utils.DivLogger;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -19,10 +20,10 @@ public class HostConfig {
     //    private final NodeRole nodeRole;
     private final String rpcNodeAddress;
 
-    private String polkadotGenesisPath = "genesis/polkadot.json";
-    private String kusamaGenesisPath = "genesis/ksmcc3.json";
-    private String westendGenesisPath = "genesis/westend2.json";
-    private String localGenesisPath = "genesis/westend-local.json";
+    private final String polkadotGenesisPath = "genesis/polkadot.json";
+    private final String kusamaGenesisPath = "genesis/ksmcc3.json";
+    private final String westendGenesisPath = "genesis/westend2.json";
+    private final String localGenesisPath = "genesis/westend-local.json";
 
     private static final DivLogger log = new DivLogger();
 
@@ -64,6 +65,15 @@ public class HostConfig {
             case KUSAMA -> kusamaGenesisPath;
             case WESTEND -> westendGenesisPath;
             case LOCAL -> localGenesisPath;
+        };
+    }
+
+    public List<String> getHttpsRpcEndpoints() {
+        return switch (chain) {
+            case POLKADOT -> RpcConstants.POLKADOT_HTTPS_RPC;
+            case KUSAMA -> RpcConstants.KUSAMA_HTTPS_RPC;
+            case WESTEND -> RpcConstants.WESTEND_HTTPS_RPC;
+            case LOCAL -> List.of();
         };
     }
 }

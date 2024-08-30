@@ -22,6 +22,7 @@ public class DBConstants {
     public static final String LATEST_ROUND = "ss::latestRound";
     public static final String SET_ID = "ss::setId";
     public static final String STATE_ROOT = "ss::stateRoot";
+    public static final String IS_PROTOCOL_SYNC = "ss::isProtocolSync";
 
     //</editor-fold>
 }

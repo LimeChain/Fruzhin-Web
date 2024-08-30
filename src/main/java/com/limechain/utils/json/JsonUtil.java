@@ -1,11 +1,11 @@
 package com.limechain.utils.json;
 
 import com.limechain.teavm.HttpRequest;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonUtil {
-
-    // Prevents instantiation
-    private JsonUtil() {}
 
     public static Object parseJson(String jsonString) {
         return new JsonParser(jsonString).parse();

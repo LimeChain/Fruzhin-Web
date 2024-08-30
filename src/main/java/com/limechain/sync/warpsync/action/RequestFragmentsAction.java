@@ -10,7 +10,6 @@ import lombok.extern.java.Log;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
 @Log
@@ -38,7 +37,8 @@ public class RequestFragmentsAction implements WarpSyncAction {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.log(Level.SEVERE, "Retry warp sync request fragment exception: "
-                                      + e.getMessage(), e.getStackTrace());
+                    + e.getMessage(), e.getStackTrace());
+                sync.setWarpSyncAction(new RpcFallbackAction());
             }
         }
         if (this.result != null) {

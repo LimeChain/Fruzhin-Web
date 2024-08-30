@@ -14,7 +14,6 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 @Getter
 @Log
@@ -28,11 +27,13 @@ public class SyncState {
     @Setter
     private Authority[] authoritySet;
     private BigInteger latestRound;
+    @Setter
     private BigInteger setId;
 
     public SyncState() {
         this.genesisBlockHash = GenesisBlockHash.POLKADOT;
 
+        clearStoredStateIfNeeded();
         loadState();
         this.startingBlock = this.lastFinalizedBlockNumber;
     }
@@ -90,7 +91,14 @@ public class SyncState {
         finalizeHeader(initState.getFinalizedBlockHeader());
     }
 
-    public String getStateRoot() {
-        return null;
+    public void saveIsProtocolSync(boolean isProtocolSync) {
+        LocalStorage.save(DBConstants.IS_PROTOCOL_SYNC, isProtocolSync);
+    }
+
+    private void clearStoredStateIfNeeded() {
+        boolean isProtocolSync = LocalStorage.find(DBConstants.IS_PROTOCOL_SYNC, boolean.class).orElse(false);
+        if (!isProtocolSync) {
+            LocalStorage.clear();
+        }
     }
 }

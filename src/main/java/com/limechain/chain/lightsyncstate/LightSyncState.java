@@ -9,7 +9,6 @@ import com.limechain.utils.StringUtils;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -51,14 +50,14 @@ public class LightSyncState {
         LightSyncState lightSyncState = new LightSyncState();
         byte[] bytes = StringUtils.hexToBytes(header);
         lightSyncState.finalizedBlockHeader = new BlockHeaderReader()
-                .read(new ScaleCodecReader(bytes));
+            .read(new ScaleCodecReader(bytes));
 
         byte[] bytes1 = StringUtils.hexToBytes(epochChanges);
         lightSyncState.epochChanges = new EpochChangesReader()
-                .read(new ScaleCodecReader(bytes1));
+            .read(new ScaleCodecReader(bytes1));
 
         lightSyncState.grandpaAuthoritySet = new AuthoritySetReader()
-                .read(new ScaleCodecReader(StringUtils.hexToBytes(grandpaAuthoritySet)));
+            .read(new ScaleCodecReader(StringUtils.hexToBytes(grandpaAuthoritySet)));
 
         return lightSyncState;
     }

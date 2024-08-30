@@ -9,7 +9,6 @@ import java.math.BigInteger;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 @Log
 public class ObjectMapper {
