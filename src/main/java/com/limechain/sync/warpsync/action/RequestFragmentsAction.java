@@ -63,7 +63,7 @@ public class RequestFragmentsAction implements WarpSyncAction {
             }
             warpSyncState.setWarpSyncFragmentsFinished(resp.isFinished());
             sync.setFragmentsQueue(new ArrayDeque<>(
-                Arrays.stream(resp.getFragments()).toList())
+                    Arrays.stream(resp.getFragments()).toList())
             );
 
             this.result = resp;
