@@ -1,10 +1,9 @@
 package com.limechain.network;
 
-import com.limechain.chain.Chain;
 import com.limechain.chain.ChainService;
-import com.limechain.config.HostConfig;
 import com.limechain.network.kad.KademliaService;
 import com.limechain.network.protocol.blockannounce.BlockAnnounceService;
+import com.limechain.network.protocol.grandpa.GrandpaService;
 import com.limechain.network.protocol.warp.WarpSyncService;
 import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
 import com.limechain.rpc.server.AppBean;
@@ -22,13 +21,12 @@ import java.util.logging.Level;
 public class Network {
     private static final Random RANDOM = new Random();
     @Getter
-    private final Chain chain;
-    @Getter
     private final String[] bootNodes;
     //    private final ConnectionManager connectionManager;
     @Getter
     private KademliaService kademliaService;
     private WarpSyncService warpSyncService;
+    private GrandpaService grandpaService;
     private BlockAnnounceService blockAnnounceService;
     private boolean started = false;
 
@@ -39,27 +37,24 @@ public class Network {
      * Connects Kademlia to boot nodes
      *
      * @param chainService chain specification information containing boot nodes
-     * @param hostConfig   host configuration containing current network
      */
-    public Network(ChainService chainService, HostConfig hostConfig) {
+    public Network(ChainService chainService) {
         this.bootNodes = chainService.getChainSpec().getBootNodes();
-        this.chain = hostConfig.getChain();
 //        this.connectionManager = ConnectionManager.getInstance();
-        this.initializeProtocols(chainService, hostConfig);
+        this.initializeProtocols(chainService);
     }
 
-    private void initializeProtocols(ChainService chainService,
-                                     HostConfig hostConfig) {
+    private void initializeProtocols(ChainService chainService) {
 
-//
         String chainId = chainService.getChainSpec().getProtocolId();
         String warpProtocolId = ProtocolUtils.getWarpSyncProtocol(chainId);
         String blockAnnounceProtocolId = ProtocolUtils.getBlockAnnounceProtocol(chainId);
-//        String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol(chainId);
+        String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol();
 
         kademliaService = new KademliaService();
         warpSyncService = new WarpSyncService(warpProtocolId);
         blockAnnounceService = new BlockAnnounceService(blockAnnounceProtocolId);
+        grandpaService = new GrandpaService(grandpaProtocolId);
 
     }
 
@@ -196,10 +191,6 @@ public class Network {
         if (!AppBean.getBean(WarpSyncState.class).isWarpSyncFinished()) {
             return;
         }
-//        connectionManager.getPeerIds().forEach(peerId -> grandpaService.sendNeighbourMessage(this.host, peerId));
+        grandpaService.sendHandshake();
     }
-//
-//    public void sendNeighbourMessage(PeerId peerId) {
-//        grandpaService.sendNeighbourMessage(this.host, peerId);
-//    }
 }

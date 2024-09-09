@@ -109,6 +109,7 @@ public class WarpSyncMachine {
         log.log(Level.INFO, "Highest known block at #" + syncState.getLastFinalizedBlockNumber());
         this.onFinishCallbacks.forEach(Runnable::run);
         this.networkService.sendBlockAnnounceHandshake();
+        this.networkService.sendNeighbourMessages();
     }
 
     public void onFinish(Runnable function) {

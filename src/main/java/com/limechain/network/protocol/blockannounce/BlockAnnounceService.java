@@ -25,8 +25,7 @@ public class BlockAnnounceService {
         try {
             BlockAnnounceEngine.sendHandshakeToAll(BlockAnnounceEngine.getHandshake(), protocolId);
         } catch (IllegalStateException e) {
-            log.warning("Error sending handshake request");
+            log.warning("Error sending block announce handshake request");
         }
-
     }
 }
