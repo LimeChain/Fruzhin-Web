@@ -2,7 +2,7 @@ package com.limechain;
 
 import com.limechain.client.HostNode;
 import com.limechain.client.LightClient;
-import com.limechain.rpc.Function;
+import com.limechain.rpc.RPCFunction;
 import com.limechain.rpc.RpcClient;
 import com.limechain.rpc.server.RpcApp;
 import com.limechain.utils.DivLogger;
@@ -34,5 +34,5 @@ public class Main {
 
     @JSBody(params = {"f", "apiName"}, script = "window[apiName] = f;" +
         "isRpcExported = true;")
-    private static native void exportAPI(Function f, JSString apiName);
+    private static native void exportAPI(RPCFunction f, JSString apiName);
 }

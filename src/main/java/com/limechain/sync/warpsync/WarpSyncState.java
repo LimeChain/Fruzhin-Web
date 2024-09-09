@@ -2,7 +2,9 @@ package com.limechain.sync.warpsync;
 
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.network.Network;
+import com.limechain.network.protocol.blockannounce.messages.BlockAnnounceMessage;
 import com.limechain.network.protocol.warp.dto.ConsensusEngine;
+import com.limechain.network.protocol.warp.dto.DigestType;
 import com.limechain.network.protocol.warp.dto.HeaderDigest;
 import com.limechain.polkaj.reader.ScaleCodecReader;
 import com.limechain.storage.block.SyncState;
@@ -16,6 +18,7 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -57,20 +60,20 @@ public class WarpSyncState {
         this.scheduledAuthorityChanges = scheduledAuthorityChanges;
     }
 
-//    /**
-//     * Update the state with information from a block announce message.
-//     * Schedule runtime updates found in header, to be executed when block is verified.
-//     *
-//     * @param blockAnnounceMessage received block announce message
-//     */
-//    public void syncBlockAnnounce(BlockAnnounceMessage blockAnnounceMessage) {
-//        boolean hasRuntimeUpdate = Arrays.stream(blockAnnounceMessage.getHeader().getDigest())
-//                .anyMatch(d -> d.getType() == DigestType.RUN_ENV_UPDATED);
-//
-//        if (hasRuntimeUpdate) {
-//            scheduledRuntimeUpdateBlocks.add(blockAnnounceMessage.getHeader().getBlockNumber());
-//        }
-//    }
+    /**
+     * Update the state with information from a block announce message.
+     * Schedule runtime updates found in header, to be executed when block is verified.
+     *
+     * @param blockAnnounceMessage received block announce message
+     */
+    public void syncBlockAnnounce(BlockAnnounceMessage blockAnnounceMessage) {
+        boolean hasRuntimeUpdate = Arrays.stream(blockAnnounceMessage.getHeader().getDigest())
+                .anyMatch(d -> d.getType() == DigestType.RUN_ENV_UPDATED);
+
+        if (hasRuntimeUpdate) {
+            scheduledRuntimeUpdateBlocks.add(blockAnnounceMessage.getHeader().getBlockNumber());
+        }
+    }
 
     /**
      * Updates the Host's state with information from a commit message.

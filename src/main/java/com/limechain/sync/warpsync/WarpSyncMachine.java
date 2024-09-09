@@ -79,11 +79,9 @@ public class WarpSyncMachine {
             final Hash256 initStateHash = this.syncState.getLastFinalizedBlockHash();
             // Always start with requesting fragments
             System.out.println("Requesting fragments... " + initStateHash);
-            this.networkService.updateCurrentSelectedPeerWithNextBootnode();
             this.warpSyncAction = new RequestFragmentsAction(initStateHash);
         } else {
             System.out.println("Warping via RPC... ");
-            this.networkService.updateCurrentSelectedPeerWithNextBootnode();
             this.warpSyncAction = new RpcFallbackAction();
         }
 
@@ -105,12 +103,12 @@ public class WarpSyncMachine {
 
     private void finishWarpSync() {
         this.warpState.setWarpSyncFinished(true);
-//        this.networkService.handshakeBootNodes();
         this.syncState.persistState();
         syncState.saveIsProtocolSync(isProtocolSync);
         System.out.println("Warp sync finished.");
         log.log(Level.INFO, "Highest known block at #" + syncState.getLastFinalizedBlockNumber());
         this.onFinishCallbacks.forEach(Runnable::run);
+        this.networkService.sendBlockAnnounceHandshake();
     }
 
     public void onFinish(Runnable function) {

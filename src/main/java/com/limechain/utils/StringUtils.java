@@ -27,11 +27,15 @@ public class StringUtils {
         return fromHex(hex);
     }
 
-    @JSBody(params = {"hex"}, script = " let bytes = [];" +
+    public byte[] fromHex(String hex){
+        return fromHexNative(hex.startsWith("0x") ? hex.substring(2) : hex);
+    }
+
+    @JSBody(params = {"hex"}, script = "let bytes = [];" +
                                        "    for (let c = 0; c < hex.length; c += 2)" +
                                        "        bytes.push(parseInt(hex.substr(c, 2), 16));" +
                                        "    return bytes;")
-    public static native byte[] fromHex(String hex);
+    private static native byte[] fromHexNative(String hex);
 
     /**
      * Removes the "0x" prefix from a hexadecimal string, if it exists.

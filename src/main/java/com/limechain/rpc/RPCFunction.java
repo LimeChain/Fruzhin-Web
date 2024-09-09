@@ -7,7 +7,7 @@ import org.teavm.jso.JSObject;
  * signature can be exported via {@link com.limechain.Main}{@code .exportAPI(Function, JSString)}
  */
 @FunctionalInterface
-public interface Function extends JSObject {
+public interface RPCFunction extends JSObject {
 
     String sendRequest(String method, String[] params);
 }
