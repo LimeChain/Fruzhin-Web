@@ -9,9 +9,9 @@ import 'https://unpkg.com/@chainsafe/libp2p-gossipsub/dist/index.min.js';
 import 'https://unpkg.com/libp2p/dist/index.min.js';
 import 'https://unpkg.com/it-pipe/dist/index.min.js';
 import 'https://unpkg.com/it-pb-stream/dist/index.min.js';
+import 'https://unpkg.com/@muradsenteca/ed25519/dist/index.min.js'
+import 'https://unpkg.com/@muradsenteca/blake2b/dist/index.min.js'
 
-import * as Blake2b from './blake2b.js';
-import * as ED25519 from './ed25519.js';
 import * as HTTP from './http.js';
 import * as Fruzhin from './fruzhin.js'
 
@@ -45,8 +45,6 @@ var startLibp2p = async (bootnodes) => {
 
 window.fruzhin = {
     startLibp2p,
-    ED25519,
     HTTP,
-    ...Blake2b,
     ...Fruzhin,
 }
