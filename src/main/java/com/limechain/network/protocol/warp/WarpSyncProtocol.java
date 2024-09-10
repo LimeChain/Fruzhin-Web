@@ -54,8 +54,8 @@ public class WarpSyncProtocol {
         }
 
         @JSBody(params = {"blockHash", "protocolId"}, script = "return (async () => {" +
-                                                               "    let peer = libp.getConnections()[0].remotePeer;" +
-                                                               "    let stream = await ItPbStream.pbStream(await libp.dialProtocol(peer, protocolId));" +
+                                                               "    let peer = window.fruzhin.libp.getConnections()[0].remotePeer;" +
+                                                               "    let stream = await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(peer, protocolId));" +
                                                                "    stream.writeLP(new Uint8Array([...blockHash.matchAll(/../g)].map(m => parseInt(m[0], 16))));" +
                                                                "    let bytes = (await stream.readLP()).subarray();" +
                                                                "    return [...bytes].map(n => n.toString(16).padStart(2, '0')).join('');" +

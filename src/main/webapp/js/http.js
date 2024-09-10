@@ -41,7 +41,7 @@ var isRpcExported = false;
 
 function sendRpcRequest(method, params) {
     return new Promise((resolve, reject) => {
-        if (isRpcExported === false) {
+        if (window.fruzhin.HTTP.getRpcExported() === false) {
             window.setTimeout(async () => {
                 try {
                     const result = await sendRpcRequest(method, params);
@@ -59,4 +59,20 @@ function sendRpcRequest(method, params) {
             }
         }
     });
+}
+
+function changeRpcExported(newVal){
+    isRpcExported = newVal;
+}
+
+function getRpcExported(){
+    return isRpcExported;
+}
+
+export {
+    sendRpcRequest,
+    asyncHttpRequest,
+    httpRequestSync,
+    changeRpcExported,
+    getRpcExported
 }

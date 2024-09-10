@@ -64,28 +64,28 @@ public class KademliaService extends NetworkService {
         successfulBootNodes = getPeerStoreSize();
     }
 
-    @JSBody(params = {"bootNodes"}, script = "start(bootNodes)")
+    @JSBody(params = {"bootNodes"}, script = "window.fruzhin.startLibp2p(bootNodes)")
     public static native void startNetwork(String[] bootNodes);
 
-    @JSBody(script = "return getPeerId()")
+    @JSBody(script = "return window.fruzhin.libp?.peerId")
     public static native Object getPeerId();
 
-    @JSBody(script = "return libp.peerId.privateKey")
+    @JSBody(script = "return window.fruzhin.libp.peerId.privateKey")
     public static native byte[] getPeerPrivateKey();
 
-    @JSBody(script = "return libp.peerId.publicKey")
+    @JSBody(script = "return window.fruzhin.libp.peerId.publicKey")
     public static native byte[] getPeerPublicKey();
 
-    @JSBody(script = "return libp.getConnections().length")
+    @JSBody(script = "return window.fruzhin.libp.getConnections().length")
     public static native int getPeerStoreSize();
 
     /**
      * Populates Kademlia dht with peers closest in distance to a random id then makes connections with our node
      */
-    @JSBody(script = "libp.peerStore.forEach( async (p) => {" +
+    @JSBody(script = "window.fruzhin.libp.peerStore.forEach( async (p) => {" +
                      "    for await (const foundPeer of dht.peerRouting.getClosestPeers(p.id.toBytes())){" +
                      "        if(foundPeer.peer?.multiaddrs?.length > 0){" +
-                     "            try{libp.dial(foundPeer.peer)}finally{}" +
+                     "            try{window.fruzhin.libp.dial(foundPeer.peer)}finally{}" +
                      "        }" +
                      "    }" +
                      "});")

@@ -23,10 +23,10 @@ public class HttpRequest {
         });
     }
 
-    @JSBody(params = {"method", "url", "body", "callback"}, script = "return asyncHttpRequest(method, url, body, callback);")
+    @JSBody(params = {"method", "url", "body", "callback"}, script = "return window.fruzhin.HTTP.asyncHttpRequest(method, url, body, callback);")
     public static native void createAsyncHttpRequest(String method, String url, String body, TeaVMCallback callback);
 
-    @JSBody(params = {"method", "url", "body"}, script = "return httpRequestSync(method, url, body);")
+    @JSBody(params = {"method", "url", "body"}, script = "return window.fruzhin.HTTP.httpRequestSync(method, url, body);")
     public static native String createHttpRequest(String method, String url, String body);
 }
 

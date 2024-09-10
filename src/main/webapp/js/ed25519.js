@@ -254,7 +254,6 @@ const _verify = (sig, msg, pub, opts = dvo) => {
     };
     return { hashable, finish };
 };
-const verifyAsync = async (s, m, p, opts = dvo) => hashFinish(true, _verify(s, m, p, opts));
 const cr = () => // We support: 1) browsers 2) node.js 19+
     typeof globalThis === 'object' && 'crypto' in globalThis ? globalThis.crypto : undefined;
 const etc = {
@@ -317,3 +316,5 @@ const wNAF = (n) => {
     }
     return { p, f }; // return both real and fake points for JIT
 };
+
+export const verifyAsync = async (s, m, p, opts = dvo) => hashFinish(true, _verify(s, m, p, opts));
