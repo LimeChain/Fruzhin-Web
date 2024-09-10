@@ -1,9 +1,9 @@
 package com.limechain.chain.lightsyncstate;
 
 import com.limechain.polkaj.Hash256;
+import com.limechain.tuple.Pair;
 import lombok.Getter;
 import lombok.Setter;
-import com.limechain.tuple.Pair;
 import lombok.ToString;
 
 import java.math.BigInteger;

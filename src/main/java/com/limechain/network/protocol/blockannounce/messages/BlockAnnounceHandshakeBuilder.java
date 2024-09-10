@@ -1,6 +1,5 @@
 package com.limechain.network.protocol.blockannounce.messages;
 
-import com.limechain.config.HostConfig;
 import com.limechain.network.protocol.blockannounce.NodeRole;
 import com.limechain.polkaj.Hash256;
 import com.limechain.rpc.server.AppBean;
