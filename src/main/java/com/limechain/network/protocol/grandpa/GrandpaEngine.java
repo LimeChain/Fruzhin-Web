@@ -36,6 +36,7 @@ public class GrandpaEngine {
     protected ConnectionManager connectionManager;
     private static NeighbourMessageBuilder neighbourMessageBuilder = new NeighbourMessageBuilder();
     private static BlockAnnounceHandshakeBuilder handshakeBuilder = new BlockAnnounceHandshakeBuilder();
+    private static WarpSyncState warpSyncState = AppBean.getBean(WarpSyncState.class);
 
     public GrandpaEngine() {
         connectionManager = ConnectionManager.getInstance();
@@ -69,13 +70,13 @@ public class GrandpaEngine {
         ScaleCodecReader reader = new ScaleCodecReader(message);
         NeighbourMessage neighbourMessage = reader.read(NeighbourMessageScaleReader.getInstance());
         log.log(Level.INFO, "Received neighbour message from Peer " + peerId + "\n" + neighbourMessage);
-        new Thread(() -> AppBean.getBean(WarpSyncState.class).syncNeighbourMessage(neighbourMessage, peerId)).start();
+        new Thread(() -> warpSyncState.syncNeighbourMessage(neighbourMessage, peerId)).start();
     }
 
     private static void handleCommitMessage(byte[] message, String peerId) {
         ScaleCodecReader reader = new ScaleCodecReader(message);
         CommitMessage commitMessage = reader.read(CommitMessageScaleReader.getInstance());
-        AppBean.getBean(WarpSyncState.class).syncCommit(commitMessage, peerId);
+        warpSyncState.syncCommit(commitMessage, peerId);
     }
 
     /**
