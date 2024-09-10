@@ -1,9 +1,9 @@
 package com.limechain.network;
 
-import com.limechain.chain.Chain;
 import com.limechain.chain.ChainService;
-import com.limechain.config.HostConfig;
 import com.limechain.network.kad.KademliaService;
+import com.limechain.network.protocol.blockannounce.BlockAnnounceService;
+import com.limechain.network.protocol.grandpa.GrandpaService;
 import com.limechain.network.protocol.warp.WarpSyncService;
 import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
 import com.limechain.rpc.server.AppBean;
@@ -14,8 +14,6 @@ import lombok.extern.java.Log;
 import java.util.Random;
 import java.util.logging.Level;
 
-import static com.limechain.network.kad.KademliaService.REPLICATION;
-
 /**
  * A Network class that handles all peer connections and Kademlia
  */
@@ -23,14 +21,14 @@ import static com.limechain.network.kad.KademliaService.REPLICATION;
 public class Network {
     private static final Random RANDOM = new Random();
     @Getter
-    private final Chain chain;
-    @Getter
     private final String[] bootNodes;
     //    private final ConnectionManager connectionManager;
     @Getter
     private KademliaService kademliaService;
+    private WarpSyncService warpSyncService;
+    private GrandpaService grandpaService;
+    private BlockAnnounceService blockAnnounceService;
     private boolean started = false;
-    private int bootPeerIndex = 0;
 
     /**
      * Initializes a host for the peer connection,
@@ -39,30 +37,26 @@ public class Network {
      * Connects Kademlia to boot nodes
      *
      * @param chainService chain specification information containing boot nodes
-     * @param hostConfig   host configuration containing current network
      */
-    public Network(ChainService chainService, HostConfig hostConfig) {
+    public Network(ChainService chainService) {
         this.bootNodes = chainService.getChainSpec().getBootNodes();
-        this.chain = hostConfig.getChain();
 //        this.connectionManager = ConnectionManager.getInstance();
-        this.initializeProtocols(chainService, hostConfig);
+        this.initializeProtocols(chainService);
     }
 
-    private void initializeProtocols(ChainService chainService,
-                                     HostConfig hostConfig) {
+    private void initializeProtocols(ChainService chainService) {
 
-//
         String chainId = chainService.getChainSpec().getProtocolId();
         String warpProtocolId = ProtocolUtils.getWarpSyncProtocol(chainId);
-//        String lightProtocolId = ProtocolUtils.getLightMessageProtocol(chainId);
-//        String blockAnnounceProtocolId = ProtocolUtils.getBlockAnnounceProtocol(chainId);
-//        String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol(chainId);
+        String blockAnnounceProtocolId = ProtocolUtils.getBlockAnnounceProtocol(chainId);
+        String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol();
 
         kademliaService = new KademliaService();
         warpSyncService = new WarpSyncService(warpProtocolId);
-    }
+        blockAnnounceService = new BlockAnnounceService(blockAnnounceProtocolId);
+        grandpaService = new GrandpaService(grandpaProtocolId);
 
-    WarpSyncService warpSyncService;
+    }
 
 //    private Ed25519PrivateKey loadPrivateKeyFromDB(KVRepository<String, Object> repository) {
 //        Ed25519PrivateKey privateKey;
@@ -95,41 +89,8 @@ public class Network {
         log.log(Level.INFO, "Stopped network module!");
     }
 
-    public boolean updateCurrentSelectedPeerWithNextBootnode() {
-//        if (bootPeerIndex > kademliaService.getBootNodePeerIds().size())
-//            return false;
-//        this.currentSelectedPeer = this.kademliaService.getBootNodePeerIds().get(bootPeerIndex);
-        bootPeerIndex++;
-        return true;
-    }
-
-    public boolean updateCurrentSelectedPeerWithBootnode(int index) {
-//        if (index >= 0 && index < this.kademliaService.getBootNodePeerIds().size()) {
-//            this.currentSelectedPeer = this.kademliaService.getBootNodePeerIds().get(index);
-//            return true;
-//        }
-        return false;
-    }
-
     public void updateCurrentSelectedPeer() {
-//        if (connectionManager.getPeerIds().isEmpty()) return;
-//        this.currentSelectedPeer = connectionManager.getPeerIds().stream()
-//                .skip(RANDOM.nextInt(connectionManager.getPeerIds().size())).findAny().orElse(null);
         kademliaService.updateSuccessfulBootNodes();
-    }
-
-//    public String getPeerId() {
-//        return this.host.getPeerId().toString();
-//    }
-
-    public String[] getListenAddresses() {
-        // TODO Bug: .listenAddresses() returns empty list
-//        return this.host.listenAddresses().stream().map(Multiaddr::toString).toArray(String[]::new);
-        return null;
-    }
-
-    public int getPeersCount() {
-        return 0;//connectionManager.getPeerIds().size();
     }
 
     /**
@@ -142,31 +103,11 @@ public class Network {
         if (!started) {
             return;
         }
-        if (getPeersCount() >= REPLICATION) {
-            log.log(Level.INFO,
-                    "Connections have reached replication factor(" + REPLICATION + "). " +
-                    "No need to search for new ones yet.");
-            return;
-        }
-
-        log.log(Level.INFO, "Searching for peers...");
         kademliaService.findNewPeers();
-
-//        if (this.currentSelectedPeer == null) {
-//            updateCurrentSelectedPeer();
-//        }
-
-        log.log(Level.INFO, String.format("Connected peers: %s", getPeersCount()));
     }
 
     //    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
     public void pingPeers() {
-        // TODO: This needs to by synchronized with the findPeers method
-        if (getPeersCount() == 0) {
-            log.log(Level.INFO, "No peers to ping.");
-            return;
-        }
-
         log.log(Level.INFO, "Pinging peers...");
 //        connectionManager.getPeerIds().forEach(this::ping);
     }
@@ -212,7 +153,8 @@ public class Network {
         return this.warpSyncService.getProtocol().warpSyncRequest(
                 blockHash);
     }
-//
+
+    //
 //    public LightClientMessage.Response makeRemoteReadRequest(String blockHash, String[] keys) {
 //        if (isPeerInvalid()) return null;
 //
@@ -237,31 +179,18 @@ public class Network {
 //        return false;
 //    }
 //
-//    public void handshakeBootNodes() {
-//        kademliaService.getBootNodePeerIds()
-//                .stream()
-//                .distinct()
-//                .forEach(this::sendGrandpaHandshake);
-//    }
-//
-//    private void sendGrandpaHandshake(PeerId peerId) {
-//        //TODO:
-//        // when using threads we connect to more than 10 peers, but have some unhandled exceptions,
-//        // without them we connect to only 2 peers
-//        new Thread(() ->
-//                blockAnnounceService.sendHandshake(this.host, this.host.getAddressBook(), peerId)
-//        ).start();
-//    }
+
+    public void sendBlockAnnounceHandshake() {
+        new Thread(() ->
+                blockAnnounceService.sendHandshake()
+        ).start();
+    }
 
     //    @Scheduled(fixedRate = 5, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
     public void sendNeighbourMessages() {
         if (!AppBean.getBean(WarpSyncState.class).isWarpSyncFinished()) {
             return;
         }
-//        connectionManager.getPeerIds().forEach(peerId -> grandpaService.sendNeighbourMessage(this.host, peerId));
+        grandpaService.sendHandshake();
     }
-//
-//    public void sendNeighbourMessage(PeerId peerId) {
-//        grandpaService.sendNeighbourMessage(this.host, peerId);
-//    }
 }

@@ -7,20 +7,8 @@ import lombok.NoArgsConstructor;
 public final class ProtocolUtils {
     public static final String PING_PROTOCOL = "/ipfs/ping/1.0.0";
 
-    public static String getLightMessageProtocol(String chainId) {
-        return String.format("/%s/light/2", chainId);
-    }
-
     public static String getWarpSyncProtocol(String chainId) {
         return String.format("/%s/sync/warp", chainId);
-    }
-
-    public static String getSyncProtocol(String chainId) {
-        return String.format("/%s/sync/2", chainId);
-    }
-
-    public static String getStateProtocol(String chainId) {
-        return String.format("/%s/state/2", chainId);
     }
 
     public static String getBlockAnnounceProtocol(String chainId) {
@@ -31,16 +19,8 @@ public final class ProtocolUtils {
         return String.format("/%s/kad", chainId);
     }
 
-    public static String getGrandpaProtocol(String chainId) {
-        return String.format("/%s/grandpa/1", grandpaProtocolChain(chainId));
+    public static String getGrandpaProtocol() {
+        return "/paritytech/grandpa/1";
     }
 
-    //TODO: figure out a more elegant solution
-    private static String grandpaProtocolChain(String chainId) {
-        return chainId.equals("dot") ? "paritytech" : chainId;
-    }
-
-    public static String getTransactionsProtocol(String chainId) {
-        return String.format("/%s/transactions/1", chainId);
-    }
 }

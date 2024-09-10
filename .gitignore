@@ -26,3 +26,4 @@ out/
 
 ### Local Chain Spec
 /src/main/webapp/genesis/westend-local.json
+.smarttomcat/

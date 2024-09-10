@@ -46,8 +46,7 @@ public class CommonConfig {
                     beans.put(beanClass, systemInfo);
                     return systemInfo;
                 case "Network":
-                    Network network = network((ChainService) getBean(ChainService.class),
-                        (HostConfig) getBean(HostConfig.class));
+                    Network network = network((ChainService) getBean(ChainService.class));
                     beans.put(beanClass, network);
                     return network;
                 case "WarpSyncState":
@@ -83,8 +82,8 @@ public class CommonConfig {
         return new SystemInfo(hostConfig);
     }
 
-    private static Network network(ChainService chainService, HostConfig hostConfig) {
-        return new Network(chainService, hostConfig);
+    private static Network network(ChainService chainService) {
+        return new Network(chainService);
     }
 
     private static WarpSyncState warpSyncState(Network network, SyncState syncState) {
