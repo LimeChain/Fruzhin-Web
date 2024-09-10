@@ -49,7 +49,7 @@ public class BlockAnnounceEngine {
 
     @JSBody(params = {"handshake", "protocolId"}, script = "window.fruzhin.libp.getConnections().forEach(async (peer) => {" +
                                                            "   let stream = await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(peer.remotePeer, protocolId));" +
-                                                           "    stream.writeLP(window.fruzhin.ED25519.h2b(handshake));" +
+                                                           "    stream.writeLP(Ed25519.h2b(handshake));" +
                                                            "});")
     public static native void sendHandshakeToAll(String handshake, String protocolId);
 
@@ -61,9 +61,9 @@ public class BlockAnnounceEngine {
             "                    let subarr = msg.subarray();" +
             "                    if(subarr.length === 69) {" +
             "                        let handshake = announceExport.getHandshake();" +
-            "                        (await ItPbStream.pbStream(stream)).writeLP(window.fruzhin.ED25519.h2b(handshake));" +
+            "                        (await ItPbStream.pbStream(stream)).writeLP(Ed25519.h2b(handshake));" +
             "                    } else if (subarr.length > 1) {" +
-            "                         announceExport.blockAnnounce(window.fruzhin.ED25519.b2h(subarr.slice(2)), connection.remotePeer.toString());" +
+            "                         announceExport.blockAnnounce(Ed25519.b2h(subarr.slice(2)), connection.remotePeer.toString());" +
             "                    }" +
             "                }" +
             "            });" +
