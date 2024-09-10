@@ -138,22 +138,6 @@ Point.BASE = new Point(Gx, Gy, 1n, mod(Gx * Gy)); // Generator / Base point
 Point.ZERO = new Point(0n, 1n, 1n, 0n); // Identity / Zero point
 const { BASE: G, ZERO: I } = Point; // Generator, identity points
 const padh = (num, pad) => num.toString(16).padStart(pad, '0');
-const b2h = (b) => Array.from(b).map(e => padh(e, 2)).join(''); // bytes to hex
-const h2b = (hex) => {
-    const l = hex.length; // error if not string,
-    if (!str(hex) || l % 2)
-        err('hex invalid 1'); // or has odd length like 3, 5.
-    const arr = u8n(l / 2); // create result array
-    for (let i = 0; i < arr.length; i++) {
-        const j = i * 2;
-        const h = hex.slice(j, j + 2); // hexByte. slice is faster than substr
-        const b = Number.parseInt(h, 16); // byte, created from string part
-        if (Number.isNaN(b) || b < 0)
-            err('hex invalid 2'); // byte must be valid 0 <= byte < 256
-        arr[i] = b;
-    }
-    return arr;
-};
 
 const n2b_32LE = (num) => h2b(padh(num, 32 * 2)).reverse(); // number to bytes LE
 const b2n_LE = (b) => BigInt('0x' + b2h(u8n(au8(b)).reverse())); // bytes LE to num
@@ -254,7 +238,6 @@ const _verify = (sig, msg, pub, opts = dvo) => {
     };
     return { hashable, finish };
 };
-const verifyAsync = async (s, m, p, opts = dvo) => hashFinish(true, _verify(s, m, p, opts));
 const cr = () => // We support: 1) browsers 2) node.js 19+
     typeof globalThis === 'object' && 'crypto' in globalThis ? globalThis.crypto : undefined;
 const etc = {
@@ -316,4 +299,22 @@ const wNAF = (n) => {
         }
     }
     return { p, f }; // return both real and fake points for JIT
+};
+
+export const verifyAsync = async (s, m, p, opts = dvo) => hashFinish(true, _verify(s, m, p, opts));
+export const b2h = (b) => Array.from(b).map(e => padh(e, 2)).join(''); // bytes to hex
+export const h2b = (hex) => {
+    const l = hex.length; // error if not string,
+    if (!str(hex) || l % 2)
+        err('hex invalid 1'); // or has odd length like 3, 5.
+    const arr = u8n(l / 2); // create result array
+    for (let i = 0; i < arr.length; i++) {
+        const j = i * 2;
+        const h = hex.slice(j, j + 2); // hexByte. slice is faster than substr
+        const b = Number.parseInt(h, 16); // byte, created from string part
+        if (Number.isNaN(b) || b < 0)
+            err('hex invalid 2'); // byte must be valid 0 <= byte < 256
+        arr[i] = b;
+    }
+    return arr;
 };

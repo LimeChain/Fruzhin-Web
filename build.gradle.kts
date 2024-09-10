@@ -1,3 +1,5 @@
+import org.teavm.gradle.api.JSModuleType
+
 plugins {
     id("java")
     id("war")
@@ -28,6 +30,7 @@ teavm.js {
     addedToWebApp = true
     mainClass = "com.limechain.Main"
     targetFileName = "fruzhin.js"
+    moduleType = JSModuleType.ES2015
 }
 
 //TODO: Debug only. Remove when doing release build

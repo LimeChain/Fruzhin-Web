@@ -47,23 +47,23 @@ public class BlockAnnounceEngine {
         return StringUtils.toHex(buf.toByteArray());
     }
 
-    @JSBody(params = {"handshake", "protocolId"}, script = "libp.getConnections().forEach(async (peer) => {" +
-                                                           "   let stream = await ItPbStream.pbStream(await libp.dialProtocol(peer.remotePeer, protocolId));" +
-                                                           "    stream.writeLP(h2b(handshake));" +
+    @JSBody(params = {"handshake", "protocolId"}, script = "window.fruzhin.libp.getConnections().forEach(async (peer) => {" +
+                                                           "   let stream = await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(peer.remotePeer, protocolId));" +
+                                                           "    stream.writeLP(window.fruzhin.ED25519.h2b(handshake));" +
                                                            "});")
     public static native void sendHandshakeToAll(String handshake, String protocolId);
 
 
     @JSBody(params = {"announceExport", "protocolId"}, script =
-            "libp.handle(protocolId, async ({connection, stream}) => {" +
+            "window.fruzhin.libp.handle(protocolId, async ({connection, stream}) => {" +
             "            ItPipe.pipe(stream, async function (source) {" +
             "                for await (const msg of source) {" +
             "                    let subarr = msg.subarray();" +
             "                    if(subarr.length === 69) {" +
             "                        let handshake = announceExport.getHandshake();" +
-            "                        (await ItPbStream.pbStream(stream)).writeLP(h2b(handshake));" +
+            "                        (await ItPbStream.pbStream(stream)).writeLP(window.fruzhin.ED25519.h2b(handshake));" +
             "                    } else if (subarr.length > 1) {" +
-            "                         announceExport.blockAnnounce(b2h(subarr.slice(2)), connection.remotePeer.toString());" +
+            "                         announceExport.blockAnnounce(window.fruzhin.ED25519.b2h(subarr.slice(2)), connection.remotePeer.toString());" +
             "                    }" +
             "                }" +
             "            });" +

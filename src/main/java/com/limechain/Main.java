@@ -33,6 +33,6 @@ public class Main {
     }
 
     @JSBody(params = {"f", "apiName"}, script = "window[apiName] = f;" +
-        "isRpcExported = true;")
+        "window.fruzhin.HTTP.changeRpcExported(true);")
     private static native void exportAPI(RPCFunction f, JSString apiName);
 }

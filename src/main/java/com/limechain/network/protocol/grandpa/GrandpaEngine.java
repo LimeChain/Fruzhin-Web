@@ -105,24 +105,24 @@ public class GrandpaEngine {
         return StringUtils.toHex(buf.toByteArray());
     }
 
-    @JSBody(params = {"handshake", "protocolId"}, script = "libp.getConnections().forEach(async (peer) => {" +
-                                                           "   let stream = await ItPbStream.pbStream(await libp.dialProtocol(peer.remotePeer, protocolId));" +
-                                                           "    stream.write(h2b(handshake));" + "});")
+    @JSBody(params = {"handshake", "protocolId"}, script = "window.fruzhin.libp.getConnections().forEach(async (peer) => {" +
+                                                           "   let stream = await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(peer.remotePeer, protocolId));" +
+                                                           "    stream.write(window.fruzhin.ED25519.h2b(handshake));" + "});")
     public static native void sendHandshakeToAll(String handshake, String protocolId);
 
     @JSBody(params = {"grandpaExport", "protocolId"}, script =
-            "libp.handle(protocolId, async ({connection, stream}) => {" +
+            "window.fruzhin.libp.handle(protocolId, async ({connection, stream}) => {" +
             "            ItPipe.pipe(stream, async function (source) {" +
             "                for await (const msg of source) {" + "                    let subarr = msg.subarray();" +
             "                    if(subarr.length === 1) {" +
             "                        let handshake = grandpaExport.getHandshake();" +
-            "                        (await ItPbStream.pbStream(stream)).writeLP(h2b(handshake));" +
+            "                        (await ItPbStream.pbStream(stream)).writeLP(window.fruzhin.ED25519.h2b(handshake));" +
             "                    } else if (subarr.length > 1) {" +
             "                        if(subarr.slice(1)[0] === 2) {" +
             "                           let niehgbourMessage = grandpaExport.getNeighbourMessage();" +
-            "                           (await ItPbStream.pbStream(stream)).writeLP(h2b(niehgbourMessage));" +
+            "                           (await ItPbStream.pbStream(stream)).writeLP(window.fruzhin.ED25519.h2b(niehgbourMessage));" +
             "                        }" +
-            "                        grandpaExport.handleMessage(b2h(subarr.slice(1)), connection.remotePeer.toString());" +
+            "                        grandpaExport.handleMessage(window.fruzhin.ED25519.b2h(subarr.slice(1)), connection.remotePeer.toString());" +
             "                    }" + "                }" + "            });" + "        });")
     public static native void registerHandler(JSObject grandpaExport, String protocolId);
 

@@ -134,7 +134,7 @@ public class JustificationVerifier {
     }
 
     @JSBody(params = {"publicKeyHex", "signatureHex",
-        "messageHex"}, script = "return verifyAsync(signatureHex, messageHex, publicKeyHex);")
+        "messageHex"}, script = "return window.fruzhin.ED25519.verifyAsync(signatureHex, messageHex, publicKeyHex);")
     public static native JSPromise<JSBoolean> verifyAsync(String publicKeyHex, String signatureHex,
                                                           String messageHex);
 }

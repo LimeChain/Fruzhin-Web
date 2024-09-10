@@ -9,6 +9,6 @@ public class HashUtils {
 
     @JSBody(params = {"inputHex"}, script = "{" +
                                             "let bytes = new Uint8Array([...inputHex.matchAll(/../g)].map(m => parseInt(m[0], 16)));" +
-                                            "return Blake2b.hash(bytes,undefined,32);" + "}")
+                                            "return window.fruzhin.Blake2b.hash(bytes,undefined,32);" + "}")
     public static native JSString hashWithBlake2b(String inputHex);
 }
