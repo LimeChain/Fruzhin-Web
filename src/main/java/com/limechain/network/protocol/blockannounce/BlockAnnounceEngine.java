@@ -59,7 +59,7 @@ public class BlockAnnounceEngine {
             "            ItPipe.pipe(stream, async function (source) {" +
             "                for await (const msg of source) {" +
             "                    let subarr = msg.subarray();" +
-            "                    if(subarr.length == 69) {" +
+            "                    if(subarr.length === 69) {" +
             "                        let handshake = announceExport.getHandshake();" +
             "                        (await ItPbStream.pbStream(stream)).writeLP(h2b(handshake));" +
             "                    } else if (subarr.length > 1) {" +

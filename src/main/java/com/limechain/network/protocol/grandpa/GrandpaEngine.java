@@ -114,11 +114,11 @@ public class GrandpaEngine {
             "libp.handle(protocolId, async ({connection, stream}) => {" +
             "            ItPipe.pipe(stream, async function (source) {" +
             "                for await (const msg of source) {" + "                    let subarr = msg.subarray();" +
-            "                    if(subarr.length == 1) {" +
+            "                    if(subarr.length === 1) {" +
             "                        let handshake = grandpaExport.getHandshake();" +
             "                        (await ItPbStream.pbStream(stream)).writeLP(h2b(handshake));" +
             "                    } else if (subarr.length > 1) {" +
-            "                        if(subarr.slice(1)[0] == 2) {" +
+            "                        if(subarr.slice(1)[0] === 2) {" +
             "                           let niehgbourMessage = grandpaExport.getNeighbourMessage();" +
             "                           (await ItPbStream.pbStream(stream)).writeLP(h2b(niehgbourMessage));" +
             "                        }" +
