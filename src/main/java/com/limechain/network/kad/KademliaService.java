@@ -6,14 +6,8 @@ import com.limechain.network.protocol.NetworkService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
-import org.teavm.interop.Async;
-import org.teavm.interop.AsyncCallback;
 import org.teavm.jso.JSBody;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 /**

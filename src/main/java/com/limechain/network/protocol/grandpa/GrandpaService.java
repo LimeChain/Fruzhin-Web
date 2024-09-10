@@ -1,17 +1,17 @@
 package com.limechain.network.protocol.grandpa;
 
-import com.limechain.network.ConnectionManager;
-import com.limechain.network.protocol.NetworkService;
+import com.limechain.network.protocol.grandpa.teavm.GrandpaHandler;
 import lombok.extern.java.Log;
 
 /**
- * Service for sending messages on {@link Grandpa} protocol.
+ * Service for sending messages on Grandpa protocol.
  */
 @Log
-public class GrandpaService extends NetworkService<Grandpa> {
-    ConnectionManager connectionManager = ConnectionManager.getInstance();
+public class GrandpaService {
+    private final String protocolId;
+
     public GrandpaService(String protocolId) {
-        this.protocol = new Grandpa(protocolId, new GrandpaProtocol());
+        this.protocolId = protocolId;
     }
 
 //    /**
@@ -35,12 +35,21 @@ public class GrandpaService extends NetworkService<Grandpa> {
 //        controller.sendNeighbourMessage();
 //    }
 
-//    private void sendHandshake(Host us, PeerId peerId) {
-//        try{
-//            GrandpaController controller = this.protocol.dialPeer(us, peerId, us.getAddressBook());
-//            controller.sendHandshake();
-//        } catch (Exception e) {
-//            log.warning("Failed to send Grandpa handshake to " + peerId);
-//        }
-//    }
+    private boolean isRegistered = false;
+
+    public void sendHandshake() {
+        try {
+            if (!isRegistered) {
+                GrandpaEngine.registerHandler(new GrandpaHandler(), protocolId);
+                isRegistered = true;
+            }
+        } catch (IllegalStateException e) {
+            log.warning("Error registering grandpa handler");
+        }
+        try {
+            GrandpaEngine.sendHandshakeToAll(GrandpaEngine.getHandshake(), protocolId);
+        } catch (IllegalStateException e) {
+            log.warning("Error sending grandpa handshake request");
+        }
+    }
 }

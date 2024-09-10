@@ -1,8 +1,8 @@
 package com.limechain.network.protocol.warp.scale.reader;
 
 import com.limechain.network.protocol.warp.dto.BlockHeader;
-import com.limechain.network.protocol.warp.dto.Precommit;
 import com.limechain.network.protocol.warp.dto.Justification;
+import com.limechain.network.protocol.warp.dto.Precommit;
 import com.limechain.polkaj.Hash256;
 import com.limechain.polkaj.reader.ScaleCodecReader;
 import com.limechain.polkaj.reader.ScaleReader;

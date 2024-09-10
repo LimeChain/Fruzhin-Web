@@ -2,10 +2,15 @@ package com.limechain.sync.warpsync;
 
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.network.Network;
+import com.limechain.network.protocol.blockannounce.messages.BlockAnnounceMessage;
+import com.limechain.network.protocol.grandpa.messages.commit.CommitMessage;
+import com.limechain.network.protocol.grandpa.messages.neighbour.NeighbourMessage;
 import com.limechain.network.protocol.warp.dto.ConsensusEngine;
+import com.limechain.network.protocol.warp.dto.DigestType;
 import com.limechain.network.protocol.warp.dto.HeaderDigest;
 import com.limechain.polkaj.reader.ScaleCodecReader;
 import com.limechain.storage.block.SyncState;
+import com.limechain.sync.JustificationVerifier;
 import com.limechain.sync.warpsync.dto.AuthoritySetChange;
 import com.limechain.sync.warpsync.dto.GrandpaDigestMessageType;
 import com.limechain.sync.warpsync.scale.ForcedChangeReader;
@@ -16,6 +21,7 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -57,20 +63,20 @@ public class WarpSyncState {
         this.scheduledAuthorityChanges = scheduledAuthorityChanges;
     }
 
-//    /**
-//     * Update the state with information from a block announce message.
-//     * Schedule runtime updates found in header, to be executed when block is verified.
-//     *
-//     * @param blockAnnounceMessage received block announce message
-//     */
-//    public void syncBlockAnnounce(BlockAnnounceMessage blockAnnounceMessage) {
-//        boolean hasRuntimeUpdate = Arrays.stream(blockAnnounceMessage.getHeader().getDigest())
-//                .anyMatch(d -> d.getType() == DigestType.RUN_ENV_UPDATED);
-//
-//        if (hasRuntimeUpdate) {
-//            scheduledRuntimeUpdateBlocks.add(blockAnnounceMessage.getHeader().getBlockNumber());
-//        }
-//    }
+    /**
+     * Update the state with information from a block announce message.
+     * Schedule runtime updates found in header, to be executed when block is verified.
+     *
+     * @param blockAnnounceMessage received block announce message
+     */
+    public void syncBlockAnnounce(BlockAnnounceMessage blockAnnounceMessage) {
+        boolean hasRuntimeUpdate = Arrays.stream(blockAnnounceMessage.getHeader().getDigest())
+                .anyMatch(d -> d.getType() == DigestType.RUN_ENV_UPDATED);
+
+        if (hasRuntimeUpdate) {
+            scheduledRuntimeUpdateBlocks.add(blockAnnounceMessage.getHeader().getBlockNumber());
+        }
+    }
 
     /**
      * Updates the Host's state with information from a commit message.
@@ -80,39 +86,39 @@ public class WarpSyncState {
      * @param commitMessage received commit message
      * @param peerId        sender of the message
      */
-//    public synchronized void syncCommit(CommitMessage commitMessage, PeerId peerId) {
-//        if (commitMessage.getVote().getBlockNumber().compareTo(syncState.getLastFinalizedBlockNumber()) <= 0) {
-//            log.log(Level.FINE, String.format("Received commit message for finalized block %d from peer %s",
-//                    commitMessage.getVote().getBlockNumber(), peerId));
-//            return;
-//        }
-//
-//        log.log(Level.INFO, "Received commit message from peer " + peerId
-//                            + " for block #" + commitMessage.getVote().getBlockNumber()
-//                            + " with hash " + commitMessage.getVote().getBlockHash()
-//                            + " with setId " + commitMessage.getSetId() + " and round " + commitMessage.getRoundNumber()
-//                            + " with " + commitMessage.getPrecommits().length + " voters");
-//
-//        boolean verified = JustificationVerifier.verify(commitMessage.getPrecommits(), commitMessage.getRoundNumber());
-//        if (!verified) {
-//            log.log(Level.WARNING, "Could not verify commit from peer: " + peerId);
-//            return;
-//        }
-//
-//        if (warpSyncFinished) {
-//            updateState(commitMessage);
-//        }
-//    }
+    public synchronized void syncCommit(CommitMessage commitMessage, String peerId) {
+        if (commitMessage.getVote().getBlockNumber().compareTo(syncState.getLastFinalizedBlockNumber()) <= 0) {
+            log.log(Level.FINE, String.format("Received commit message for finalized block %d from peer %s",
+                    commitMessage.getVote().getBlockNumber(), peerId));
+            return;
+        }
 
-//    private void updateState(CommitMessage commitMessage) {
-//        BigInteger lastFinalizedBlockNumber = syncState.getLastFinalizedBlockNumber();
-//        if (commitMessage.getVote().getBlockNumber().compareTo(lastFinalizedBlockNumber) < 1) {
-//            return;
-//        }
-//        syncState.finalizedCommitMessage(commitMessage);
-//
-//        log.log(Level.INFO, "Reached block #" + lastFinalizedBlockNumber);
-//    }
+        log.log(Level.INFO, "Received commit message from peer " + peerId
+                            + " for block #" + commitMessage.getVote().getBlockNumber()
+                            + " with hash " + commitMessage.getVote().getBlockHash()
+                            + " with setId " + commitMessage.getSetId() + " and round " + commitMessage.getRoundNumber()
+                            + " with " + commitMessage.getPrecommits().length + " voters");
+
+        boolean verified = JustificationVerifier.verify(commitMessage.getPrecommits(), commitMessage.getRoundNumber());
+        if (!verified) {
+            log.log(Level.WARNING, "Could not verify commit from peer: " + peerId);
+            return;
+        }
+
+        if (warpSyncFinished) {
+            updateState(commitMessage);
+        }
+    }
+
+    private void updateState(CommitMessage commitMessage) {
+        BigInteger lastFinalizedBlockNumber = syncState.getLastFinalizedBlockNumber();
+        if (commitMessage.getVote().getBlockNumber().compareTo(lastFinalizedBlockNumber) < 1) {
+            return;
+        }
+        syncState.finalizedCommitMessage(commitMessage);
+
+        log.log(Level.INFO, "Reached block #" + lastFinalizedBlockNumber);
+    }
 
     /**
      * Updates the Host's state with information from a neighbour message.
@@ -122,14 +128,13 @@ public class WarpSyncState {
      * @param neighbourMessage received neighbour message
      * @param peerId           sender of message
      */
-//    public void syncNeighbourMessage(NeighbourMessage neighbourMessage, PeerId peerId) {
-//        network.sendNeighbourMessage(peerId);
-//        if (warpSyncFinished && neighbourMessage.getSetId().compareTo(syncState.getSetId()) > 0) {
-//            updateSetData(neighbourMessage.getLastFinalizedBlock().add(BigInteger.ONE), peerId);
-//        }
-//    }
+    public void syncNeighbourMessage(NeighbourMessage neighbourMessage, String peerId) {
+        if (warpSyncFinished && neighbourMessage.getSetId().compareTo(syncState.getSetId()) > 0) {
+            updateSetData(neighbourMessage.getLastFinalizedBlock().add(BigInteger.ONE), peerId);
+        }
+    }
 
-//    private void updateSetData(BigInteger setChangeBlock, PeerId peerId) {
+    private void updateSetData(BigInteger setChangeBlock, String peerId) {
 //        BlockResponse response = network.syncBlock(peerId, setChangeBlock);
 //        BlockData block = response.getBlocksList().get(0);
 //
@@ -142,7 +147,7 @@ public class WarpSyncState {
 //                new ScaleCodecReader(block.getJustification().toByteArray()));
 //        boolean verified = justification != null
 //                           && JustificationVerifier.verify(justification.getPrecommits(), justification.getRound());
-//
+
 //        if (verified) {
 //            BlockHeader header = new BlockHeaderReader().read(new ScaleCodecReader(block.getHeader().toByteArray()));
 //
@@ -150,7 +155,7 @@ public class WarpSyncState {
 //            handleAuthorityChanges(header.getDigest(), setChangeBlock);
 //            handleScheduledEvents();
 //        }
-//    }
+    }
 
     /**
      * Executes authority changes, scheduled for the current block.

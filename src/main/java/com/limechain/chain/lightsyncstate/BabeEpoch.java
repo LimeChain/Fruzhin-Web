@@ -1,8 +1,8 @@
 package com.limechain.chain.lightsyncstate;
 
+import com.limechain.tuple.Pair;
 import lombok.Getter;
 import lombok.Setter;
-import com.limechain.tuple.Pair;
 
 import java.math.BigInteger;
 import java.util.List;

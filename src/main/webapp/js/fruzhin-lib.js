@@ -16,8 +16,7 @@ import * as HTTP from './http.js';
 import * as Fruzhin from './fruzhin.js'
 
 var startLibp2p = async (bootnodes) => {
-    console.log('Starting libp2p node');
-    console.log(bootnodes);
+
     let test = {
         addresses: {
             listen: [],
@@ -42,19 +41,6 @@ var startLibp2p = async (bootnodes) => {
 
     window.fruzhin.libp = await Libp2P.createLibp2p(test);
     window.fruzhin.libp.start();
-
-    // libp.addEventListener('peer:discovery', (evt) => console.log('Discovered:', evt.detail.id.toString()))
-    // libp.addEventListener('peer:connect', (evt) => console.log('Connected:', evt.detail.toString()))
-    // libp.addEventListener('peer:disconnect', (evt) => console.log('Disconnected:', evt.detail.toString()))
-
-    // let pbStream = ItProtobufStream.pbStream;
-    //
-    // libp.handle('/dot/sync/warp', ({stream}) => {
-    //
-    //     console.log('Received a warp sync request');
-    //     stream.write('Hello from the other side');
-    //     stream.end();
-    // });
 }
 
 window.fruzhin = {
