@@ -1,6 +1,5 @@
 package com.limechain.utils;
 
-import com.limechain.polkaj.Hash256;
 import lombok.experimental.UtilityClass;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.core.JSString;

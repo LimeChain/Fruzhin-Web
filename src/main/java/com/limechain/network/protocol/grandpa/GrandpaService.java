@@ -1,11 +1,5 @@
 package com.limechain.network.protocol.grandpa;
 
-import com.limechain.network.ConnectionManager;
-import com.limechain.network.kad.dto.Host;
-import com.limechain.network.kad.dto.PeerId;
-import com.limechain.network.protocol.NetworkService;
-import com.limechain.network.protocol.blockannounce.BlockAnnounceEngine;
-import com.limechain.network.protocol.blockannounce.teavm.BlockAnnounceHandler;
 import com.limechain.network.protocol.grandpa.teavm.GrandpaHandler;
 import lombok.extern.java.Log;
 
