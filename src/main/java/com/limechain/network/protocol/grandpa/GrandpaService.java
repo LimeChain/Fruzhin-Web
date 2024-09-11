@@ -14,27 +14,6 @@ public class GrandpaService {
         this.protocolId = protocolId;
     }
 
-//    /**
-//     * Sends a neighbour message to a peer. If there is no initiator stream opened with the peer,
-//     * sends a handshake instead.
-//     *
-//     * @param us our host object
-//     * @param peerId message receiver
-//     */
-//    public void sendNeighbourMessage(Host us, PeerId peerId) {
-//        Optional.ofNullable(connectionManager.getPeerInfo(peerId))
-//                .map(p -> p.getGrandpaStreams().getInitiator())
-//                .ifPresentOrElse(
-//                        this::sendNeighbourMessage,
-//                        () -> sendHandshake(us, peerId)
-//                );
-//    }
-//
-//    private void sendNeighbourMessage(Stream stream) {
-//        GrandpaController controller = new GrandpaController(stream);
-//        controller.sendNeighbourMessage();
-//    }
-
     private boolean isRegistered = false;
 
     public void sendHandshake() {
