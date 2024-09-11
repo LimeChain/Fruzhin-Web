@@ -18,7 +18,11 @@ public final class ChainRpcClient extends RpcClient {
     }
 
     public static ChainGetHeaderResult getHeader(String blockHash) {
-        RpcResponse response = sendRpcRequest(RpcMethod.CHAIN_GET_HEADER, List.of(blockHash));
+        List<Object> params = blockHash == null
+                ? List.of()
+                : List.of(blockHash);
+
+        RpcResponse response = sendRpcRequest(RpcMethod.CHAIN_GET_HEADER, params);
         return getResult(response, ChainGetHeaderResult.class);
     }
 }

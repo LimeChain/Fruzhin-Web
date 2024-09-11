@@ -2,9 +2,9 @@ package com.limechain.sync.warpsync;
 
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.network.Network;
-import com.limechain.network.protocol.blockannounce.messages.BlockAnnounceMessage;
 import com.limechain.network.protocol.grandpa.messages.commit.CommitMessage;
 import com.limechain.network.protocol.grandpa.messages.neighbour.NeighbourMessage;
+import com.limechain.network.protocol.warp.dto.BlockHeader;
 import com.limechain.network.protocol.warp.dto.ConsensusEngine;
 import com.limechain.network.protocol.warp.dto.DigestType;
 import com.limechain.network.protocol.warp.dto.HeaderDigest;
@@ -49,9 +49,9 @@ public class WarpSyncState {
 
     public WarpSyncState(SyncState syncState, Network network) {
         this(syncState,
-            network,
-            new HashSet<>(),
-            new PriorityQueue<>(Comparator.comparing(Pair::getValue0)));
+                network,
+                new HashSet<>(),
+                new PriorityQueue<>(Comparator.comparing(Pair::getValue0)));
     }
 
     public WarpSyncState(SyncState syncState, Network network,
@@ -64,17 +64,17 @@ public class WarpSyncState {
     }
 
     /**
-     * Update the state with information from a block announce message.
+     * Update the state with information from a block header.
      * Schedule runtime updates found in header, to be executed when block is verified.
      *
-     * @param blockAnnounceMessage received block announce message
+     * @param header the block header to check for a runtime update digest
      */
-    public void syncBlockAnnounce(BlockAnnounceMessage blockAnnounceMessage) {
-        boolean hasRuntimeUpdate = Arrays.stream(blockAnnounceMessage.getHeader().getDigest())
+    public void syncRuntimeUpdate(BlockHeader header) {
+        boolean hasRuntimeUpdate = Arrays.stream(header.getDigest())
                 .anyMatch(d -> d.getType() == DigestType.RUN_ENV_UPDATED);
 
         if (hasRuntimeUpdate) {
-            scheduledRuntimeUpdateBlocks.add(blockAnnounceMessage.getHeader().getBlockNumber());
+            scheduledRuntimeUpdateBlocks.add(header.getBlockNumber());
         }
     }
 
@@ -94,10 +94,10 @@ public class WarpSyncState {
         }
 
         log.log(Level.INFO, "Received commit message from peer " + peerId
-                            + " for block #" + commitMessage.getVote().getBlockNumber()
-                            + " with hash " + commitMessage.getVote().getBlockHash()
-                            + " with setId " + commitMessage.getSetId() + " and round " + commitMessage.getRoundNumber()
-                            + " with " + commitMessage.getPrecommits().length + " voters");
+                + " for block #" + commitMessage.getVote().getBlockNumber()
+                + " with hash " + commitMessage.getVote().getBlockHash()
+                + " with setId " + commitMessage.getSetId() + " and round " + commitMessage.getRoundNumber()
+                + " with " + commitMessage.getPrecommits().length + " voters");
 
         boolean verified = JustificationVerifier.verify(commitMessage.getPrecommits(), commitMessage.getRoundNumber());
         if (!verified) {
