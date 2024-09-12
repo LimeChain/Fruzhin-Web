@@ -45,7 +45,7 @@ public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
      * @return The {@link RpcResponse} representation of the received RPC json result.
      */
     protected static RpcResponse sendRpcRequest(RpcMethod method, List<Object> params) {
-        String jsonResult = HttpRequest.asyncHttpRequest(POST, LOAD_BALANCER.getNextEndpoint(),
+        String jsonResult = HttpRequest.createHttpRequest(POST, LOAD_BALANCER.getNextEndpoint(),
             createRpcRequestJson(method.getMethod(), params));
         return OBJECT_MAPPER.mapToClass(jsonResult, RpcResponse.class);
     }

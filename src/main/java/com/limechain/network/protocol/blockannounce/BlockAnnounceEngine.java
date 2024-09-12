@@ -2,9 +2,9 @@ package com.limechain.network.protocol.blockannounce;
 
 import com.limechain.exception.scale.ScaleEncodingException;
 import com.limechain.network.protocol.blockannounce.messages.BlockAnnounceHandshakeBuilder;
-import com.limechain.network.protocol.blockannounce.messages.BlockAnnounceMessage;
 import com.limechain.network.protocol.blockannounce.scale.BlockAnnounceHandshakeScaleWriter;
 import com.limechain.network.protocol.blockannounce.scale.BlockAnnounceMessageScaleReader;
+import com.limechain.network.protocol.warp.dto.BlockHeader;
 import com.limechain.polkaj.reader.ScaleCodecReader;
 import com.limechain.polkaj.writer.ScaleCodecWriter;
 import com.limechain.rpc.server.AppBean;
@@ -27,14 +27,14 @@ public class BlockAnnounceEngine {
 
     public static void handleBlockAnnounce(byte[] msg, String peerId) {
         ScaleCodecReader reader = new ScaleCodecReader(msg);
-        BlockAnnounceMessage announce = reader.read(new BlockAnnounceMessageScaleReader());
+        BlockHeader announceHeader = reader.read(new BlockAnnounceMessageScaleReader()).getHeader();
 //        connectionManager.updatePeer(peerId, announce);
-        AppBean.getBean(WarpSyncState.class).syncBlockAnnounce(announce);
-        log.log(Level.FINE, "Received block announce for block #" + announce.getHeader().getBlockNumber() +
-                            " from " + peerId +
-                            " with hash:0x" + announce.getHeader().getHash() +
-                            " parentHash:" + announce.getHeader().getParentHash() +
-                            " stateRoot:" + announce.getHeader().getStateRoot());
+        AppBean.getBean(WarpSyncState.class).syncRuntimeUpdate(announceHeader);
+        log.log(Level.FINE, "Received block announce for block #" + announceHeader.getBlockNumber() +
+                " from " + peerId +
+                " with hash:0x" + announceHeader.getHash() +
+                " parentHash:" + announceHeader.getParentHash() +
+                " stateRoot:" + announceHeader.getStateRoot());
     }
 
     public static String getHandshake() {
@@ -48,29 +48,29 @@ public class BlockAnnounceEngine {
     }
 
     @JSBody(params = {"handshake", "protocolId"}, script = "window.fruzhin.libp.getConnections().forEach(async (peer) => {" +
-                                                           "   let stream = await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(peer.remotePeer, protocolId));" +
-                                                           "    stream.writeLP(Ed25519.h2b(handshake));" +
-                                                           "});")
+            "   let stream = await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(peer.remotePeer, protocolId));" +
+            "    stream.writeLP(Ed25519.h2b(handshake));" +
+            "});")
     public static native void sendHandshakeToAll(String handshake, String protocolId);
 
 
     @JSBody(params = {"announceExport", "protocolId"}, script =
             "window.fruzhin.libp.handle(protocolId, async ({connection, stream}) => {" +
-            "    ItPipe.pipe(stream, async function (source) {" +
-            "        for await (const msg of source) {" +
-            "            let subarr = msg.subarray();" +
-            "            if(subarr.length === 69) {" +
-            "                let handshake = announceExport.getHandshake();" +
-            "                (await ItPbStream.pbStream(stream)).writeLP(Ed25519.h2b(handshake));" +
-            "            } else if (subarr.length > 1) {" +
-            "                 announceExport.blockAnnounce(Ed25519.b2h(subarr.slice(2)), connection.remotePeer.toString());" +
-            "            }" +
-            "        }" +
-            "    });" +
-            "});" +
-            "fruzhin.libp.addEventListener('peer:connect', async (evt) => {" +
-            "    let handshake = announceExport.getHandshake();" +
-            "    (await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(evt.detail, protocolId))).writeLP(Ed25519.h2b(handshake));" +
-            "});")
+                    "    ItPipe.pipe(stream, async function (source) {" +
+                    "        for await (const msg of source) {" +
+                    "            let subarr = msg.subarray();" +
+                    "            if(subarr.length === 69) {" +
+                    "                let handshake = announceExport.getHandshake();" +
+                    "                (await ItPbStream.pbStream(stream)).writeLP(Ed25519.h2b(handshake));" +
+                    "            } else if (subarr.length > 1) {" +
+                    "                 announceExport.blockAnnounce(Ed25519.b2h(subarr.slice(2)), connection.remotePeer.toString());" +
+                    "            }" +
+                    "        }" +
+                    "    });" +
+                    "});" +
+                    "fruzhin.libp.addEventListener('peer:connect', async (evt) => {" +
+                    "    let handshake = announceExport.getHandshake();" +
+                    "    (await ItPbStream.pbStream(await window.fruzhin.libp.dialProtocol(evt.detail, protocolId))).writeLP(Ed25519.h2b(handshake));" +
+                    "});")
     public static native void registerHandler(JSObject announceExport, String protocolId);
 }
