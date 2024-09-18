@@ -41,11 +41,7 @@ public class WsRpcClientImpl implements WsRpcClient {
         });
 
         ws.onOpen(e -> System.out.println("Websocket connection is open."));
-        ws.onMessage(e -> {
-            rpcResponses.offerLast(e.getDataAsString());
-            //TODO RPC_SUPPORT Remove after finalized
-            System.out.println(rpcResponses.peekLast());
-        });
+        ws.onMessage(e -> rpcResponses.offerLast(e.getDataAsString()));
     }
 
     /**
