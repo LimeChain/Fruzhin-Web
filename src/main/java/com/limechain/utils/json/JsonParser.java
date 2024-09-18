@@ -159,10 +159,10 @@ public class JsonParser {
 
     private boolean isValidNumberChar() {
         return (Character.isDigit(json.charAt(index))
-            || json.charAt(index) == '-'
-            || json.charAt(index) == '.'
-            || json.charAt(index) == 'e'
-            || json.charAt(index) == 'E');
+                || json.charAt(index) == '-'
+                || json.charAt(index) == '.'
+                || json.charAt(index) == 'e'
+                || json.charAt(index) == 'E');
     }
 
     private void skipWhitespace() {

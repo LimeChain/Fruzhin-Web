@@ -34,7 +34,7 @@ public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
      */
     public static String sendRpcRequest(String method, Object[] params) {
         return HttpRequest.createHttpRequest(POST, LOAD_BALANCER.getNextEndpoint(),
-            createRpcRequestJson(method, List.of(params)));
+                createRpcRequestJson(method, List.of(params)));
     }
 
     /**
@@ -46,7 +46,7 @@ public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
      */
     protected static RpcResponse sendRpcRequest(RpcMethod method, List<Object> params) {
         String jsonResult = HttpRequest.createHttpRequest(POST, LOAD_BALANCER.getNextEndpoint(),
-            createRpcRequestJson(method.getMethod(), params));
+                createRpcRequestJson(method.getMethod(), params));
         return OBJECT_MAPPER.mapToClass(jsonResult, RpcResponse.class);
     }
 
@@ -67,7 +67,7 @@ public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
     protected static <T> T getResult(RpcResponse response, Class<T> klazz) {
         if (response.getError() != null) {
             throw new IllegalStateException("RPC request resulted in an error with code:" + response.getError().getCode()
-                + " and message:" + response.getError().getMessage());
+                    + " and message:" + response.getError().getMessage());
         }
 
         return OBJECT_MAPPER.mapToClass(JsonUtil.stringify(response.getResult()), klazz);
