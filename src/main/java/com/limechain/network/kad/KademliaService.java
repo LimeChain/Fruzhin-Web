@@ -1,10 +1,7 @@
 package com.limechain.network.kad;
 
-import com.limechain.network.kad.dto.Host;
-import com.limechain.network.kad.dto.PeerId;
 import com.limechain.network.protocol.NetworkService;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.java.Log;
 import org.teavm.jso.JSBody;
 
@@ -18,8 +15,6 @@ import java.util.logging.Level;
 public class KademliaService extends NetworkService {
     public static final int REPLICATION = 20;
 
-    @Setter
-    private Host host;
     private int successfulBootNodes;
 
     /**
@@ -39,12 +34,6 @@ public class KademliaService extends NetworkService {
             }
             peer = getPeerId();
         }
-        String peerIdStr = peer.toString();
-        byte[] privateKey = getPeerPrivateKey();
-        byte[] publicKey = getPeerPublicKey();
-
-        PeerId peerId = new PeerId(privateKey, publicKey, peerIdStr);
-        this.host = new Host(peerId);
 
         successfulBootNodes = getPeerStoreSize();
 
@@ -64,12 +53,6 @@ public class KademliaService extends NetworkService {
     @JSBody(script = "return window.fruzhin.libp?.peerId")
     public static native Object getPeerId();
 
-    @JSBody(script = "return window.fruzhin.libp.peerId.privateKey")
-    public static native byte[] getPeerPrivateKey();
-
-    @JSBody(script = "return window.fruzhin.libp.peerId.publicKey")
-    public static native byte[] getPeerPublicKey();
-
     @JSBody(script = "return window.fruzhin.libp.getConnections().length")
     public static native int getPeerStoreSize();
 
@@ -77,12 +60,12 @@ public class KademliaService extends NetworkService {
      * Populates Kademlia dht with peers closest in distance to a random id then makes connections with our node
      */
     @JSBody(script = "window.fruzhin.libp.peerStore.forEach( async (p) => {" +
-                     "    for await (const foundPeer of dht.peerRouting.getClosestPeers(p.id.toBytes())){" +
-                     "        if(foundPeer.peer?.multiaddrs?.length > 0){" +
-                     "            try{window.fruzhin.libp.dial(foundPeer.peer)}finally{}" +
-                     "        }" +
-                     "    }" +
-                     "});")
+            "    for await (const foundPeer of dht.peerRouting.getClosestPeers(p.id.toBytes())){" +
+            "        if(foundPeer.peer?.multiaddrs?.length > 0){" +
+            "            try{window.fruzhin.libp.dial(foundPeer.peer)}finally{}" +
+            "        }" +
+            "    }" +
+            "});")
     public static native void findNewPeers();
 
 }
