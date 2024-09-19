@@ -23,6 +23,15 @@ public class HttpRequest {
         });
     }
 
+    /**
+     * Sends an HTTP request using the specified method and URL.
+     * The result or error is returned via the provided callback function.
+     *
+     * @param method   - HTTP method
+     * @param url      - The target URL for the request
+     * @param body     - Optional request body (used for 'POST')
+     * @param callback - Function to handle the response or error
+     */
     @JSBody(params = {"method", "url", "body", "callback"}, script = "fetch(" +
             "url, {" +
             "   method: method," +
