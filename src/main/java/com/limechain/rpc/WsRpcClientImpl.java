@@ -7,6 +7,7 @@ import org.teavm.jso.core.JSString;
 import org.teavm.jso.websocket.WebSocket;
 
 import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
  * The implementation of {@link WsRpcClient}. Uses a native JS Websocket implementation.
@@ -14,10 +15,10 @@ import java.util.ArrayDeque;
 public class WsRpcClientImpl implements WsRpcClient {
 
     private WebSocket ws;
-    private final ArrayDeque<String> rpcResponses;
+    private final Queue<String> responseQueue;
 
     public WsRpcClientImpl() {
-        rpcResponses = new ArrayDeque<>();
+        responseQueue = new ArrayDeque<>();
         openWebsocketConnection();
     }
 
@@ -41,7 +42,7 @@ public class WsRpcClientImpl implements WsRpcClient {
         });
 
         ws.onOpen(e -> System.out.println("Websocket connection is open."));
-        ws.onMessage(e -> rpcResponses.offerLast(e.getDataAsString()));
+        ws.onMessage(e -> responseQueue.offer(e.getDataAsString()));
     }
 
     /**
@@ -79,6 +80,6 @@ public class WsRpcClientImpl implements WsRpcClient {
      */
     @Override
     public String nextResponse() {
-        return rpcResponses.poll();
+        return responseQueue.poll();
     }
 }
