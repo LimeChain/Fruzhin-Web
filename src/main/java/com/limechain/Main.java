@@ -4,6 +4,8 @@ import com.limechain.client.HostNode;
 import com.limechain.client.LightClient;
 import com.limechain.rpc.RPCFunction;
 import com.limechain.rpc.RpcClient;
+import com.limechain.rpc.WsRpcClient;
+import com.limechain.rpc.WsRpcClientImpl;
 import com.limechain.rpc.server.RpcApp;
 import com.limechain.utils.DivLogger;
 import org.teavm.jso.JSBody;
@@ -13,13 +15,16 @@ import java.util.logging.Level;
 
 public class Main {
 
-    private static final String RPC_VARIABLE_NAME = "rpc";
+    private static final String HTTP_RPC = "rpc";
+    private static final String WS_RPC = "wsRpc";
 
     private static final DivLogger log = new DivLogger();
 
     public static void main(String[] args) {
+        exportHttpRpc(RpcClient::sendRpcRequest, JSString.valueOf(HTTP_RPC));
+        exportWsRpc(new WsRpcClientImpl(), JSString.valueOf(WS_RPC));
+
         log.log("Starting LimeChain node...");
-        exportAPI(RpcClient::sendRpcRequest, JSString.valueOf(RPC_VARIABLE_NAME));
 
         RpcApp rpcApp = new RpcApp();
         rpcApp.start();
@@ -33,6 +38,9 @@ public class Main {
     }
 
     @JSBody(params = {"f", "apiName"}, script = "window[apiName] = f;" +
-        "window.fruzhin.HTTP.changeRpcExported(true);")
-    private static native void exportAPI(RPCFunction f, JSString apiName);
+            "window.fruzhin.HTTP.changeRpcExported(true);")
+    private static native void exportHttpRpc(RPCFunction f, JSString apiName);
+
+    @JSBody(params = {"c", "apiName"}, script = "window[apiName] = c;")
+    private static native void exportWsRpc(WsRpcClient c, JSString apiName);
 }
