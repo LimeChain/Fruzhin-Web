@@ -5,7 +5,6 @@ import com.limechain.constants.RpcConstants;
 import com.limechain.utils.DivLogger;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -38,9 +37,6 @@ public class HostConfig {
 
         log.log(Level.INFO, "Loading rpcNodeAddress...");
         switch (chain.getValue()) {
-            case "POLKADOT", "LOCAL":
-                rpcNodeAddress = RpcConstants.POLKADOT_WS_RPC;
-                break;
             case "KUSAMA":
                 rpcNodeAddress = RpcConstants.KUSAMA_WS_RPC;
                 break;
@@ -68,12 +64,11 @@ public class HostConfig {
         };
     }
 
-    public List<String> getHttpsRpcEndpoints() {
+    public String getHttpsRpcEndpoint() {
         return switch (chain) {
-            case POLKADOT -> RpcConstants.POLKADOT_HTTPS_RPC;
             case KUSAMA -> RpcConstants.KUSAMA_HTTPS_RPC;
             case WESTEND -> RpcConstants.WESTEND_HTTPS_RPC;
-            case LOCAL -> List.of();
+            case POLKADOT, LOCAL -> RpcConstants.POLKADOT_HTTPS_RPC;
         };
     }
 }

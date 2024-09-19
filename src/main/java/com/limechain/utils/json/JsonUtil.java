@@ -16,6 +16,6 @@ public class JsonUtil {
     }
 
     public static String readJsonFromFile(String filePath) {
-        return HttpRequest.asyncHttpRequest("GET", filePath, null);
+        return HttpRequest.sendHttpRequest("GET", filePath, null);
     }
 }

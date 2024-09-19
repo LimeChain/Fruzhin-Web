@@ -6,10 +6,10 @@ import com.limechain.rpc.ChainRpcClient;
 import com.limechain.rpc.dto.ChainGetHeaderResult;
 import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncState;
-import com.limechain.teavm.TeaVMScheduler;
 import com.limechain.utils.RpcUtils;
 import com.limechain.utils.Stopwatch;
 import lombok.extern.java.Log;
+import org.teavm.jso.browser.Window;
 
 import java.util.logging.Level;
 
@@ -46,7 +46,7 @@ public class BlockAnnounceService {
     }
 
     private static void registerFallbackRpcScheduler(Stopwatch stopwatch) {
-        TeaVMScheduler.schedule(() -> {
+        Window.setInterval(() -> new Thread(() -> {
             if (stopwatch.getElapsedTime() > FALLBACK_THRESHOLD) {
                 ChainGetHeaderResult rpcResult = ChainRpcClient.getHeader(null);
                 BlockHeader fallbackHeader = RpcUtils.toBlockHeader(rpcResult);
@@ -57,6 +57,6 @@ public class BlockAnnounceService {
                         " parentHash:" + fallbackHeader.getParentHash() +
                         " stateRoot:" + fallbackHeader.getStateRoot());
             }
-        }, 6_000);
+        }).start(), 6_000);
     }
 }

@@ -12,7 +12,6 @@ import 'https://unpkg.com/it-pipe@3.0.1/dist/index.min.js';
 import 'https://unpkg.com/@muradsenteca/blake2b@1.0.1/dist/index.min.js'
 import 'https://unpkg.com/@muradsenteca/ed25519@1.0.0/dist/index.min.js'
 
-import * as HTTP from './http.js';
 import * as Fruzhin from './fruzhin.js'
 
 var startLibp2p = async (bootnodes) => {
@@ -45,6 +44,5 @@ var startLibp2p = async (bootnodes) => {
 
 window.fruzhin = {
     startLibp2p,
-    HTTP,
     ...Fruzhin,
 }
