@@ -21,21 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
 
     private static final String POST = "POST";
+    private static final String HTTP_RPC_ENDPOINT = AppBean.getBean(HostConfig.class).getHttpsRpcEndpoint();
     private static final AtomicInteger ID_COUNTER = new AtomicInteger(1);
-    private static final LoadBalancer LOAD_BALANCER = new LoadBalancer(AppBean.getBean(HostConfig.class));
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(false);
-
-    /**
-     * Send an RPC request. Currently used only by the exported RPC client.
-     *
-     * @param method {@link String} representation of the RPC method name. For example "system_name".
-     * @param params An array of parameters for the sent RPC request.
-     * @return The {@link String} representation of the received RPC json result.
-     */
-    public static String sendRpcRequest(String method, Object[] params) {
-        return HttpRequest.createHttpRequest(POST, LOAD_BALANCER.getNextEndpoint(),
-            createRpcRequestJson(method, List.of(params)));
-    }
 
     /**
      * Send an RPC request. Used by the specific implementations of the RpcClient.
@@ -45,8 +33,8 @@ public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
      * @return The {@link RpcResponse} representation of the received RPC json result.
      */
     protected static RpcResponse sendRpcRequest(RpcMethod method, List<Object> params) {
-        String jsonResult = HttpRequest.createHttpRequest(POST, LOAD_BALANCER.getNextEndpoint(),
-            createRpcRequestJson(method.getMethod(), params));
+        String jsonResult = HttpRequest.sendHttpRequest(POST, HTTP_RPC_ENDPOINT,
+                createRpcRequestJson(method.getMethod(), params));
         return OBJECT_MAPPER.mapToClass(jsonResult, RpcResponse.class);
     }
 
@@ -67,7 +55,7 @@ public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
     protected static <T> T getResult(RpcResponse response, Class<T> klazz) {
         if (response.getError() != null) {
             throw new IllegalStateException("RPC request resulted in an error with code:" + response.getError().getCode()
-                + " and message:" + response.getError().getMessage());
+                    + " and message:" + response.getError().getMessage());
         }
 
         return OBJECT_MAPPER.mapToClass(JsonUtil.stringify(response.getResult()), klazz);
