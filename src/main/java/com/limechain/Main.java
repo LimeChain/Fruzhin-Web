@@ -2,8 +2,12 @@ package com.limechain;
 
 import com.limechain.client.HostNode;
 import com.limechain.client.LightClient;
+import com.limechain.rpc.WsRpcClient;
+import com.limechain.rpc.WsRpcClientImpl;
 import com.limechain.rpc.server.RpcApp;
 import com.limechain.utils.DivLogger;
+import org.teavm.jso.JSBody;
+import org.teavm.jso.core.JSString;
 
 import java.util.logging.Level;
 
@@ -14,7 +18,6 @@ public class Main {
     private static final DivLogger log = new DivLogger();
 
     public static void main(String[] args) {
-        exportHttpRpc(RpcClient::sendRpcRequest, JSString.valueOf(HTTP_RPC));
         exportWsRpc(new WsRpcClientImpl(), JSString.valueOf(WS_RPC));
 
         log.log("Starting LimeChain node...");
