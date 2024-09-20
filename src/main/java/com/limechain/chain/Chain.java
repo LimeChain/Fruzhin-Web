@@ -54,7 +54,7 @@ public enum Chain {
     }
 
     /**
-     * Tries to map protocol string parameter to an enum based on its protocol field.
+     * Tries to map chain id string parameter to an enum based on its id field.
      *
      * @param id name of the enum id to map
      * @return {@link Chain} or null if mapping is unsuccessful
