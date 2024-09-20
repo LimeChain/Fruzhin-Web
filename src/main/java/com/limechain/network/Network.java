@@ -1,18 +1,20 @@
 package com.limechain.network;
 
-import com.limechain.chain.ChainService;
+import com.limechain.config.AppBean;
+import com.limechain.config.ChainService;
 import com.limechain.network.kad.KademliaService;
 import com.limechain.network.protocol.blockannounce.BlockAnnounceService;
 import com.limechain.network.protocol.grandpa.GrandpaService;
 import com.limechain.network.protocol.warp.WarpSyncService;
 import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncState;
 import lombok.Getter;
 import lombok.extern.java.Log;
 
 import java.util.Random;
 import java.util.logging.Level;
+
+//TODO: Cleanup
 
 /**
  * A Network class that handles all peer connections and Kademlia
@@ -44,9 +46,9 @@ public class Network {
         this.initializeProtocols(chainService);
     }
 
-    private void initializeProtocols(ChainService chainService) {
+    private void initializeProtocols(ChainService config) {
 
-        String chainId = chainService.getChainSpec().getProtocolId();
+        String chainId = config.getChainSpec().getProtocolId();
         String warpProtocolId = ProtocolUtils.getWarpSyncProtocol(chainId);
         String blockAnnounceProtocolId = ProtocolUtils.getBlockAnnounceProtocol(chainId);
         String grandpaProtocolId = ProtocolUtils.getGrandpaProtocol();

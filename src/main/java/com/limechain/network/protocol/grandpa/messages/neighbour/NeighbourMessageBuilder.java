@@ -1,6 +1,6 @@
 package com.limechain.network.protocol.grandpa.messages.neighbour;
 
-import com.limechain.rpc.server.AppBean;
+import com.limechain.config.AppBean;
 import com.limechain.storage.block.SyncState;
 
 

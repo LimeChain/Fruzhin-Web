@@ -1,4 +1,4 @@
-package com.limechain.rpc.server;
+package com.limechain.config;
 
 import lombok.extern.java.Log;
 
@@ -16,7 +16,7 @@ public class AppBean {
      * Returns the Spring managed bean instance of the given class type if it exists.
      * Returns null otherwise.
      */
-    public static <T extends Object> T getBean(Class<T> beanClass) {
-        return (T) CommonConfig.getBean(beanClass);
+    public static <T> T getBean(Class<T> beanClass) {
+        return CommonConfig.getBean(beanClass);
     }
 }

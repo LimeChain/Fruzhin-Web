@@ -3,11 +3,13 @@ package com.limechain.storage;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+// TODO Cleanup
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DBConstants {
+public class StorageConstants {
     /**
-    * Key for storing the privateKey for nabu
-    *  */
+     * Key for storing the privateKey for nabu
+     */
     public static final String PEER_ID = "nodePeerId";
     /**
      * Key under which the genesis chain spec is stored
@@ -23,6 +25,7 @@ public class DBConstants {
     public static final String SET_ID = "ss::setId";
     public static final String STATE_ROOT = "ss::stateRoot";
     public static final String IS_PROTOCOL_SYNC = "ss::isProtocolSync";
+    public static final String LAST_SYNCED_CHAIN = "ss::lastSyncedChain";
 
     //</editor-fold>
 }

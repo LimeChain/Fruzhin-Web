@@ -1,5 +1,6 @@
 package com.limechain.network.protocol.blockannounce;
 
+import com.limechain.config.AppBean;
 import com.limechain.exception.scale.ScaleEncodingException;
 import com.limechain.network.protocol.blockannounce.messages.BlockAnnounceHandshakeBuilder;
 import com.limechain.network.protocol.blockannounce.scale.BlockAnnounceHandshakeScaleWriter;
@@ -7,7 +8,6 @@ import com.limechain.network.protocol.blockannounce.scale.BlockAnnounceMessageSc
 import com.limechain.network.protocol.warp.dto.BlockHeader;
 import com.limechain.polkaj.reader.ScaleCodecReader;
 import com.limechain.polkaj.writer.ScaleCodecWriter;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncState;
 import com.limechain.utils.StringUtils;
 import lombok.AccessLevel;

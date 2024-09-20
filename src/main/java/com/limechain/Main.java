@@ -2,9 +2,11 @@ package com.limechain;
 
 import com.limechain.client.HostNode;
 import com.limechain.client.LightClient;
+import com.limechain.config.AppBean;
+import com.limechain.config.ChainService;
+import com.limechain.config.CommonConfig;
 import com.limechain.rpc.WsRpcClient;
 import com.limechain.rpc.WsRpcClientImpl;
-import com.limechain.rpc.server.RpcApp;
 import com.limechain.utils.DivLogger;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.core.JSString;
@@ -18,19 +20,29 @@ public class Main {
     private static final DivLogger log = new DivLogger();
 
     public static void main(String[] args) {
-        exportWsRpc(new WsRpcClientImpl(), JSString.valueOf(WS_RPC));
+        if (args.length != 1) {
+            throw new IllegalStateException(
+                    "Please provide a valid chain spec string or one of the supported chain names.");
+        }
 
         log.log("Starting LimeChain node...");
 
-        RpcApp rpcApp = new RpcApp();
-        rpcApp.start();
+        String chainString = args[0];
+        initContext(chainString);
 
         HostNode client = new LightClient();
-
-        // Start the client
-        // NOTE: This starts the beans the client would need - mutates the global context
         client.start();
+
         log.log(Level.INFO, "\uD83D\uDE80Started light client!");
+    }
+
+    private static void initContext(String chainString) {
+        ChainService chainService = AppBean.getBean(ChainService.class);
+        chainService.init(chainString);
+
+        CommonConfig.start();
+
+        exportWsRpc(new WsRpcClientImpl(), JSString.valueOf(WS_RPC));
     }
 
     @JSBody(params = {"c", "apiName"}, script = "window[apiName] = c;")

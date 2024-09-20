@@ -1,9 +1,9 @@
 package com.limechain.sync.warpsync.action;
 
+import com.limechain.config.AppBean;
 import com.limechain.exception.global.MissingObjectException;
 import com.limechain.network.protocol.warp.dto.WarpSyncResponse;
 import com.limechain.polkaj.Hash256;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import com.limechain.sync.warpsync.WarpSyncState;
 import lombok.extern.java.Log;
@@ -37,7 +37,7 @@ public class RequestFragmentsAction implements WarpSyncAction {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.log(Level.SEVERE, "Retry warp sync request fragment exception: "
-                    + e.getMessage(), e.getStackTrace());
+                        + e.getMessage(), e.getStackTrace());
                 sync.setWarpSyncAction(new RpcFallbackAction());
             }
         }

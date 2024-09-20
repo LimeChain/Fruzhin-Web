@@ -1,8 +1,8 @@
 package com.limechain.sync.warpsync;
 
-import com.limechain.chain.ChainService;
 import com.limechain.chain.lightsyncstate.Authority;
 import com.limechain.chain.lightsyncstate.LightSyncState;
+import com.limechain.config.ChainService;
 import com.limechain.network.Network;
 import com.limechain.network.protocol.warp.dto.WarpSyncFragment;
 import com.limechain.polkaj.Hash256;
@@ -72,7 +72,7 @@ public class WarpSyncMachine {
             LightSyncState initState = LightSyncState.decode(this.chainService.getChainSpec().getLightSyncState());
 
             if (this.syncState.getLastFinalizedBlockNumber()
-                .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
+                    .compareTo(initState.getFinalizedBlockHeader().getBlockNumber()) < 0) {
                 this.syncState.setLightSyncState(initState);
             }
 
@@ -102,14 +102,15 @@ public class WarpSyncMachine {
     }
 
     private void finishWarpSync() {
-        this.warpState.setWarpSyncFinished(true);
-        this.syncState.persistState();
-        syncState.saveIsProtocolSync(isProtocolSync);
+        warpState.setWarpSyncFinished(true);
+        syncState.persistState(isProtocolSync, chainService.getChain().getId());
+
         System.out.println("Warp sync finished.");
         log.log(Level.INFO, "Highest known block at #" + syncState.getLastFinalizedBlockNumber());
-        this.onFinishCallbacks.forEach(Runnable::run);
-        this.networkService.sendBlockAnnounceHandshake();
-        this.networkService.sendNeighbourMessages();
+
+        onFinishCallbacks.forEach(Runnable::run);
+        networkService.sendBlockAnnounceHandshake();
+        networkService.sendNeighbourMessages();
     }
 
     public void onFinish(Runnable function) {

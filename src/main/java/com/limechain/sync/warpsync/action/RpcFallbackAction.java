@@ -1,11 +1,11 @@
 package com.limechain.sync.warpsync.action;
 
+import com.limechain.config.AppBean;
 import com.limechain.polkaj.Hash256;
 import com.limechain.rpc.ChainRpcClient;
 import com.limechain.rpc.GrandpaRpcClient;
 import com.limechain.rpc.dto.ChainGetHeaderResult;
 import com.limechain.rpc.dto.GrandpaRoundStateResult;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import com.limechain.utils.RpcUtils;
@@ -36,9 +36,9 @@ public class RpcFallbackAction implements WarpSyncAction {
         }
 
         log.log(Level.INFO, "Populated sync state from RPC results. Block hash is now at #"
-            + syncState.getLastFinalizedBlockNumber() + ": "
-            + syncState.getLastFinalizedBlockHash().toString()
-            + " with state root " + syncState.getStateRoot());
+                + syncState.getLastFinalizedBlockNumber() + ": "
+                + syncState.getLastFinalizedBlockHash().toString()
+                + " with state root " + syncState.getStateRoot());
 
         sync.setWarpSyncAction(new FinishedAction());
     }
