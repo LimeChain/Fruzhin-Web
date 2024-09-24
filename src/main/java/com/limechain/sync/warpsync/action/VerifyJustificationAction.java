@@ -1,8 +1,8 @@
 package com.limechain.sync.warpsync.action;
 
+import com.limechain.config.AppBean;
 import com.limechain.exception.sync.JustificationVerificationException;
 import com.limechain.network.protocol.warp.dto.WarpSyncFragment;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.JustificationVerifier;
 import com.limechain.sync.warpsync.WarpSyncMachine;
@@ -53,7 +53,7 @@ public class VerifyJustificationAction implements WarpSyncAction {
             }
             boolean verified = JustificationVerifier.verify(
                     fragment.getJustification().getPrecommits(),
-                fragment.getJustification().getRound());
+                    fragment.getJustification().getRound());
             if (!verified) {
                 throw new JustificationVerificationException("Justification could not be verified.");
             }
@@ -70,11 +70,11 @@ public class VerifyJustificationAction implements WarpSyncAction {
         try {
             warpSyncState.handleAuthorityChanges(
                     fragment.getHeader().getDigest(),
-                fragment.getJustification().getTargetBlock());
+                    fragment.getJustification().getTargetBlock());
             log.log(Level.INFO, "Verified justification. Block hash is now at #"
                     + syncState.getLastFinalizedBlockNumber() + ": "
-                + syncState.getLastFinalizedBlockHash().toString()
-                + " with state root " + syncState.getStateRoot());
+                    + syncState.getLastFinalizedBlockHash().toString()
+                    + " with state root " + syncState.getStateRoot());
         } catch (Exception e) {
             this.error = e;
         }

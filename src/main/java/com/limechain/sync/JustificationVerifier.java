@@ -1,9 +1,9 @@
 package com.limechain.sync;
 
 import com.limechain.chain.lightsyncstate.Authority;
+import com.limechain.config.AppBean;
 import com.limechain.network.protocol.warp.dto.Precommit;
 import com.limechain.polkaj.Hash256;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.storage.block.SyncState;
 import com.limechain.utils.LittleEndianUtils;
 import com.limechain.utils.StringUtils;
@@ -41,7 +41,7 @@ public class JustificationVerifier {
 
         Set<Hash256> seenPublicKeys = new HashSet<>();
         Set<Hash256> authorityKeys =
-            Arrays.stream(authorities).map(Authority::getPublicKey).map(Hash256::new).collect(Collectors.toSet());
+                Arrays.stream(authorities).map(Authority::getPublicKey).map(Hash256::new).collect(Collectors.toSet());
 
         for (Precommit precommit : precommits) {
             if (!authorityKeys.contains(precommit.getAuthorityPublicKey())) {
@@ -60,9 +60,9 @@ public class JustificationVerifier {
             byte[] data = getDataToVerify(precommit, authoritiesSetId, round);
 
             boolean isValid = verifySignature(
-                StringUtils.toHex(precommit.getAuthorityPublicKey().getBytes()),
-                StringUtils.toHex(precommit.getSignature().getBytes()),
-                StringUtils.toHex(data));
+                    StringUtils.toHex(precommit.getAuthorityPublicKey().getBytes()),
+                    StringUtils.toHex(precommit.getSignature().getBytes()),
+                    StringUtils.toHex(data));
 
             if (!isValid) {
                 log.log(Level.WARNING, "Failed to verify signature");
@@ -134,7 +134,7 @@ public class JustificationVerifier {
     }
 
     @JSBody(params = {"publicKeyHex", "signatureHex",
-        "messageHex"}, script = "return Ed25519.verifyAsync(signatureHex, messageHex, publicKeyHex);")
+            "messageHex"}, script = "return Ed25519.verifyAsync(signatureHex, messageHex, publicKeyHex);")
     public static native JSPromise<JSBoolean> verifyAsync(String publicKeyHex, String signatureHex,
                                                           String messageHex);
 }

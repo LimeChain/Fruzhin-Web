@@ -1,10 +1,11 @@
 package com.limechain.config;
 
-import com.limechain.chain.Chain;
 import com.limechain.utils.DivLogger;
 import lombok.Getter;
 
 import java.util.logging.Level;
+
+//TODO: Cleanup
 
 /**
  * Configuration class used to hold and information used by the system rpc methods
@@ -12,16 +13,16 @@ import java.util.logging.Level;
 @Getter
 public class SystemInfo {
     //    private final String role;
-    private final Chain chain;
+    private final ChainService chainService;
     //    private final String hostIdentity;
     private String hostName = "Fruzhin";
     private String hostVersion = "0.0.1";
 
     private static final DivLogger log = new DivLogger();
 
-    public SystemInfo(HostConfig hostConfig) {
+    public SystemInfo(ChainService chainService) {
 //        this.role = network.getNodeRole().name();
-        this.chain = hostConfig.getChain();
+        this.chainService = chainService;
 //        this.hostIdentity = network.getHost().getPeerId().toString();
         logSystemInfo();
     }
@@ -38,7 +39,7 @@ public class SystemInfo {
 
         log.log(Level.INFO, lemonEmoji + "LimeChain Fruzhin");
         log.log(Level.INFO, pinEmoji + "Version: " + hostVersion);
-        log.log(Level.INFO, clipboardEmoji + "Chain specification: " + chain.getValue());
+        log.log(Level.INFO, clipboardEmoji + "Chain specification: " + chainService.getChain().getValue());
         log.log(Level.INFO, labelEmoji + "Host name: " + hostName);
 //        log.log(Level.INFO, authEmoji + "Role: " + role);
 //        log.log(Level.INFO, "Local node identity is: " + hostIdentity);

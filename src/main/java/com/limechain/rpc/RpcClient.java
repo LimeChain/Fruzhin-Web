@@ -1,10 +1,10 @@
 package com.limechain.rpc;
 
-import com.limechain.config.HostConfig;
+import com.limechain.config.AppBean;
+import com.limechain.config.ChainService;
 import com.limechain.rpc.dto.RpcMethod;
 import com.limechain.rpc.dto.RpcRequest;
 import com.limechain.rpc.dto.RpcResponse;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.teavm.HttpRequest;
 import com.limechain.utils.json.JsonUtil;
 import com.limechain.utils.json.ObjectMapper;
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public sealed class RpcClient permits ChainRpcClient, GrandpaRpcClient {
 
     private static final String POST = "POST";
-    private static final String HTTP_RPC_ENDPOINT = AppBean.getBean(HostConfig.class).getHttpsRpcEndpoint();
+    private static final String HTTP_RPC_ENDPOINT = AppBean.getBean(ChainService.class).getHttpsEndpoint();
     private static final AtomicInteger ID_COUNTER = new AtomicInteger(1);
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(false);
 

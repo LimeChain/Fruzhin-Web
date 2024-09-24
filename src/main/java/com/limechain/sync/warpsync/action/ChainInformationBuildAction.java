@@ -1,6 +1,6 @@
 package com.limechain.sync.warpsync.action;
 
-import com.limechain.rpc.server.AppBean;
+import com.limechain.config.AppBean;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import com.limechain.sync.warpsync.WarpSyncState;
 import lombok.AccessLevel;
@@ -30,11 +30,11 @@ public class ChainInformationBuildAction implements WarpSyncAction {
     @Override
     public void handle(WarpSyncMachine sync) {
         log.log(Level.INFO, "Aura Api version: " + sync.getChainInformation().getRuntimeAuraVersion()
-                            + " Babe api version: " + sync.getChainInformation().getRuntimeBabeVersion() +
-                            " Grandpa Api Version: " + sync.getChainInformation().getRuntimeGrandpaVersion());
+                + " Babe api version: " + sync.getChainInformation().getRuntimeBabeVersion() +
+                " Grandpa Api Version: " + sync.getChainInformation().getRuntimeGrandpaVersion());
         log.log(Level.INFO, "Runtime supports aura: " + sync.getChainInformation().runtimeHasAura());
         log.log(Level.INFO, "Runtime babe api is v1: " + sync.getChainInformation().runtimeBabeApiIsV1());
         log.log(Level.INFO, "Runtime grandpa supports current setId: "
-                            + sync.getChainInformation().runtimeGrandpaSupportsCurrentSetId());
+                + sync.getChainInformation().runtimeGrandpaSupportsCurrentSetId());
     }
 }

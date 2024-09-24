@@ -1,6 +1,6 @@
 package com.limechain.sync.warpsync.action;
 
-import com.limechain.rpc.server.AppBean;
+import com.limechain.config.AppBean;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import com.limechain.sync.warpsync.WarpSyncState;
 import lombok.extern.java.Log;
@@ -10,6 +10,7 @@ import java.util.logging.Level;
 @Log
 public class FinishedAction implements WarpSyncAction {
     private final WarpSyncState warpSyncState;
+
     public FinishedAction() {
         this.warpSyncState = AppBean.getBean(WarpSyncState.class);
         log.log(Level.INFO, "Finished with warp sync!");

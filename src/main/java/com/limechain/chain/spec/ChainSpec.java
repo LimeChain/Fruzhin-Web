@@ -6,7 +6,6 @@ import com.limechain.utils.json.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -28,9 +27,8 @@ public class ChainSpec implements Serializable {
      *
      * @param pathToChainSpecJSON path to the chain specification json file
      * @return class instance mapped to the json file
-     * @throws IOException If path is invalid
      */
-    public static ChainSpec newFromJSON(String pathToChainSpecJSON) throws IOException {
+    public static ChainSpec newFromJSON(String pathToChainSpecJSON) {
         ObjectMapper mapper = new ObjectMapper(false);
         String jsonChainSpec = JsonUtil.readJsonFromFile(pathToChainSpecJSON);
         return mapper.mapToClass(jsonChainSpec, ChainSpec.class);

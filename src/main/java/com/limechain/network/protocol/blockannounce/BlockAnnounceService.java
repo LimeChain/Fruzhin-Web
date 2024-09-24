@@ -1,10 +1,10 @@
 package com.limechain.network.protocol.blockannounce;
 
+import com.limechain.config.AppBean;
 import com.limechain.network.protocol.blockannounce.teavm.BlockAnnounceHandler;
 import com.limechain.network.protocol.warp.dto.BlockHeader;
 import com.limechain.rpc.ChainRpcClient;
 import com.limechain.rpc.dto.ChainGetHeaderResult;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncState;
 import com.limechain.utils.RpcUtils;
 import com.limechain.utils.Stopwatch;

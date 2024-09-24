@@ -1,7 +1,7 @@
 package com.limechain.client;
 
+import com.limechain.config.AppBean;
 import com.limechain.network.Network;
-import com.limechain.rpc.server.AppBean;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import com.limechain.utils.DivLogger;
 import lombok.SneakyThrows;

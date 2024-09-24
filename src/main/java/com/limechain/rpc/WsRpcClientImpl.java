@@ -1,6 +1,7 @@
 package com.limechain.rpc;
 
-import com.limechain.constants.RpcConstants;
+import com.limechain.config.AppBean;
+import com.limechain.config.ChainService;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.teavm.jso.browser.Window;
@@ -28,8 +29,7 @@ public class WsRpcClientImpl implements WsRpcClient {
 
     private void openWebsocketConnection() {
         log.info("Initializing RPC websocket connection...");
-        //TODO change when configuring chain.
-        ws = new WebSocket(RpcConstants.POLKADOT_WS_RPC);
+        ws = new WebSocket(AppBean.getBean(ChainService.class).getWsRpcEndpoint());
         initHandlers();
     }
 

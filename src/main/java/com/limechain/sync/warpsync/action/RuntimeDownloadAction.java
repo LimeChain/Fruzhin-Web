@@ -1,6 +1,6 @@
 package com.limechain.sync.warpsync.action;
 
-import com.limechain.rpc.server.AppBean;
+import com.limechain.config.AppBean;
 import com.limechain.storage.block.SyncState;
 import com.limechain.sync.warpsync.WarpSyncMachine;
 import lombok.AllArgsConstructor;
