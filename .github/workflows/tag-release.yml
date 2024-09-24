@@ -61,6 +61,7 @@ jobs:
 
       - name: Build Changelog
         id: changelog
+        continue-on-error: true
         uses: requarks/changelog-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,14 +70,12 @@ jobs:
           tag: ${{ github.event.inputs.tag_name }}
 
       - name: Write release version
-        if: always()
         run: |
           VERSION=${{ github.event.inputs.tag_name }}
           echo "Releasing version: $VERSION"
           sed -i -e 's@version = .\d*.\d*.\d*.*@version = "'"$VERSION"'"@g' build.gradle.kts
 
       - name: Set up cache for Gradle
-        if: always()
         uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
@@ -85,18 +84,15 @@ jobs:
             gradle-${{ runner.os }}
 
       - name: Set up JDK 21
-        if: always()
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'corretto'
 
       - name: Build Gradle Project
-        if: always()
         run: ./gradlew build
 
       - name: Create release
-        if: always()
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -109,7 +105,6 @@ jobs:
           prerelease: false
 
       - name: Upload Release Asset
-        if: always()
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
