@@ -38,12 +38,6 @@ jobs:
         with:
           ref: dev
 
-      - name: Write release version
-        run: |
-          VERSION=${{ github.event.inputs.tag_name }}
-          echo "Releasing version: $VERSION"
-          sed -i -e 's@version = .\d*.\d*.\d*.*@version = "'"$VERSION"'"@g' build.gradle.kts
-
       - name: Create or use provided tag
         run: |
           # Use provided tag from the input
@@ -61,15 +55,6 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-${{ runner.os }}
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'corretto'
-
-      - name: Build Gradle Project
-        run: ./gradlew build
 
   github-release:
     name: Create GitHub Release
@@ -91,7 +76,24 @@ jobs:
           token: ${{ github.token }}
           tag: ${{ github.event.inputs.tag_name }}
 
+      - name: Write release version
+        if: always()
+        run: |
+          VERSION=${{ github.event.inputs.tag_name }}
+          echo "Releasing version: $VERSION"
+          sed -i -e 's@version = .\d*.\d*.\d*.*@version = "'"$VERSION"'"@g' build.gradle.kts
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Build Gradle Project
+        run: ./gradlew build
+
       - name: Create release
+        if: always()
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -99,11 +101,12 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag_name }}
           release_name: Release ${{ github.event.inputs.tag_name }}
-          body: ${{ steps.changelog.outputs.changes }}
+          body: ${{ steps.changelog.outputs.changes || 'No changelog available' }}
           draft: false
           prerelease: false
 
       - name: Upload Release Asset
+        if: always()
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
@@ -124,6 +127,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag_name }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Build Gradle Project
+        run: ./gradlew build
 
       - name: Unzip WAR file
         run: |
