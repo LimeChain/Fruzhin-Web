@@ -84,7 +84,7 @@ jobs:
 
       - name: Build Changelog
         id: changelog
-        uses: requarks/changelog-action@v11
+        uses: requarks/changelog-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -127,8 +127,8 @@ jobs:
 
       - name: Unzip WAR file
         run: |
-          unzip build/libs/*.war -d dist
-          rm -rf dist/META-INF dist/WEB-INF dist/index.html
+          unzip ./build/libs/*.war -d dist
+          rm -rf ./dist/META-INF ./dist/WEB-INF ./dist/index.html
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
