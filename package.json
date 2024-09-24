@@ -4,7 +4,8 @@
   "description": "An implementation of Fruzhin's light client usable in the web.",
   "main": "./dist/js/fruzhin-lib.js",
   "files": [
-    "./dist"
+    "./dist/js",
+    "./dist/genesis"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
