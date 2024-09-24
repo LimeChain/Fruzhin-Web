@@ -1,0 +1,30 @@
+{
+  "name": "fruzhin-web",
+  "version": "1.0.0",
+  "description": "An implementation of Fruzhin's light client usable in the web.",
+  "main": "./dist/js/fruzhin-lib.js",
+  "files": [
+    "./dist/js",
+    "./dist/genesis"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LimeChain/Fruzhin-web.git"
+  },
+  "keywords": [
+    "teavm",
+    "java",
+    "js",
+    "npm",
+    "polkadot"
+  ],
+  "author": "LimeChain (LimeLabs EOOD)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/LimeChain/Fruzhin-web/issues"
+  },
+  "homepage": "https://github.com/LimeChain/Fruzhin-web#readme"
+}
