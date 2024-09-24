@@ -149,6 +149,12 @@ jobs:
           unzip ./build/libs/*.war -d dist
           rm -rf ./dist/META-INF ./dist/WEB-INF ./dist/index.html
 
+      - name: Update package.json version
+        run: |
+          VERSION=${{ github.event.inputs.tag_name }}
+          echo "Updating package.json with version: $VERSION"
+          sed -i -e 's/"version": ".*"/"version": "'"$VERSION"'"/' package.json
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:

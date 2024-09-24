@@ -1,5 +1,5 @@
 {
-  "name": "fruzhin-web",
+  "name": "fruzhin",
   "version": "1.0.0",
   "description": "An implementation of Fruzhin's light client usable in the web.",
   "main": "./dist/js/fruzhin-lib.js",
