@@ -127,6 +127,7 @@ jobs:
 
       - name: Unzip WAR file
         run: |
+          ls -l
           unzip ./build/libs/*.war -d dist
           rm -rf ./dist/META-INF ./dist/WEB-INF ./dist/index.html
 
