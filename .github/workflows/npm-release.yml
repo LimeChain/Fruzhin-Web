@@ -59,6 +59,10 @@ jobs:
       - name: Install NPM dependencies
         run: npm install
 
+      # Login to NPM
+      - name: Login to NPM
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
       # Publish to NPM
       - name: Publish to NPM
         env:
