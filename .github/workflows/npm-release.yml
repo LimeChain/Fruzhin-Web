@@ -30,7 +30,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'corretto'
-          cache: gradle
 
       - name: Build Gradle Project
         run: ./gradlew build
@@ -55,7 +54,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       # Install NPM dependencies
       - name: Install NPM dependencies
