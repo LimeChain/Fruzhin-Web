@@ -12,9 +12,9 @@ import com.limechain.sync.warpsync.action.RequestFragmentsAction;
 import com.limechain.sync.warpsync.action.RpcFallbackAction;
 import com.limechain.sync.warpsync.action.WarpSyncAction;
 import com.limechain.tuple.Pair;
-import com.limechain.utils.DivLogger;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -22,13 +22,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.logging.Level;
 
 @Getter
 @Setter
+@Log
 public class WarpSyncMachine {
-
-    private static final DivLogger log = new DivLogger();
 
     private Queue<WarpSyncFragment> fragmentsQueue;
     private WarpSyncAction warpSyncAction;
@@ -106,7 +104,7 @@ public class WarpSyncMachine {
         syncState.persistState(isProtocolSync, chainService.getChain().getId());
 
         System.out.println("Warp sync finished.");
-        log.log(Level.INFO, "Highest known block at #" + syncState.getLastFinalizedBlockNumber());
+        log.info("Highest known block at #" + syncState.getLastFinalizedBlockNumber());
 
         onFinishCallbacks.forEach(Runnable::run);
         networkService.sendBlockAnnounceHandshake();

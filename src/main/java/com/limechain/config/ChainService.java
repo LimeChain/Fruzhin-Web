@@ -3,11 +3,9 @@ package com.limechain.config;
 import com.limechain.chain.Chain;
 import com.limechain.chain.spec.ChainSpec;
 import com.limechain.polkaj.Hash256;
-import com.limechain.utils.DivLogger;
 import com.limechain.utils.json.ObjectMapper;
 import lombok.Getter;
-
-import java.util.logging.Level;
+import lombok.extern.java.Log;
 
 // TODO: Cleanup
 
@@ -15,6 +13,7 @@ import java.util.logging.Level;
  * Configuration class used to store any Host specific information
  */
 @Getter
+@Log
 public class ChainService {
 
     private static final String GENESIS_DIR_FORMAT = "genesis/%s.json";
@@ -30,10 +29,8 @@ public class ChainService {
      */
     private ChainSpec chainSpec;
 
-    private static final DivLogger log = new DivLogger();
-
     public void init(String chainString) {
-        log.log(Level.INFO, "Loading chain context...");
+        log.fine("Loading chain context...");
 
         Chain cliChain = Chain.fromString(chainString);
         try {
@@ -48,7 +45,7 @@ public class ChainService {
             System.out.println("Something went wrong while loading chain data. " + e.getMessage());
         }
 
-        log.log(Level.INFO, "✅️Loaded chain context for the " + chain.getValue() + " chain.");
+        log.info("✅️Loaded chain context for the " + chain.getValue() + " chain.");
     }
 
     /**

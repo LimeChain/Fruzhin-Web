@@ -7,17 +7,14 @@ import com.limechain.config.ChainService;
 import com.limechain.config.CommonConfig;
 import com.limechain.rpc.WsRpcClient;
 import com.limechain.rpc.WsRpcClientImpl;
-import com.limechain.utils.DivLogger;
+import lombok.extern.java.Log;
 import org.teavm.jso.JSBody;
 import org.teavm.jso.core.JSString;
 
-import java.util.logging.Level;
-
+@Log
 public class Main {
 
     private static final String WS_RPC = "wsRpc";
-
-    private static final DivLogger log = new DivLogger();
 
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -25,7 +22,7 @@ public class Main {
                     "Please provide a valid chain spec string or one of the supported chain names.");
         }
 
-        log.log("Starting LimeChain node...");
+        log.info("Starting LimeChain node...");
 
         String chainString = args[0];
         initContext(chainString);
@@ -33,7 +30,7 @@ public class Main {
         HostNode client = new LightClient();
         client.start();
 
-        log.log(Level.INFO, "\uD83D\uDE80Started light client!");
+        log.info("\uD83D\uDE80Started light client!");
     }
 
     private static void initContext(String chainString) {
