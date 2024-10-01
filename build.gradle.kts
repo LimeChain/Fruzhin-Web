@@ -32,11 +32,3 @@ teavm.js {
     targetFileName = "fruzhin.js"
     moduleType = JSModuleType.ES2015
 }
-
-//TODO: Debug only. Remove when doing release build
-teavm {
-    js {
-        sourceMap.set(true)
-        debugInformation.set(true)
-    }
-}
